@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <string>
 #include <limits>
+#include <fstream>
 
 using namespace std;
 
@@ -99,10 +100,32 @@ private:
         cout << "\n";
     }
 
+    const std::string SCORE_FILE = "minesweeper_score.txt";
+
+    void saveScore() {
+        std::ofstream file(SCORE_FILE);
+        if (file.is_open()) {
+            file << totalScore;
+        }
+    }
+
+    
+    void loadScore() {
+        std::ifstream file(SCORE_FILE);
+        if (file.is_open()) {
+            file >> totalScore;
+        }
+    }
+
 public:
     Minesweeper() : rows(9), cols(9), mines(10), score(0), totalScore(0), gameOver(false), gameWon(false) {
         srand(time(0));
         initializeGrid();
+        loadScore();
+    }
+
+    ~Minesweeper() {
+        saveScore();
     }
 
     void setDifficulty(int level) {
@@ -177,29 +200,57 @@ public:
             printBoard();
             cout << "Total Score: " << totalScore << "\n";
             cout << "Current game score: " << score << "\n";
-            cout << "Enter command (r for reveal, f for flag/unflag, q to quit): ";
-
-            string input;
-            getline(cin, input);
-            if (input.empty()) {
-                continue;
+    
+            string cmd;
+            while (true) {
+                cout << "Enter command (r for reveal, f for flag/unflag, q to quit): ";
+                getline(cin, cmd);
+                    
+                cmd.erase(0, cmd.find_first_not_of(" \t"));
+                cmd.erase(cmd.find_last_not_of(" \t") + 1);
+    
+                if (cmd.empty()) {
+                    continue;
+                }
+    
+                if (cmd.size() == 1 && (cmd[0] == 'r' || cmd[0] == 'f' || cmd[0] == 'q')) {
+                    break;
+                } else {
+                    cout << "Invalid command! Please enter ONLY 'r', 'f' or 'q'.\n";
+                }
             }
-
-            char cmd = input[0];
-            if (cmd == 'q') {
+    
+            if (cmd[0] == 'q') {
                 return;
             }
-
-            int r, c;
-            cout << "Enter row and column: ";
-            cin >> r >> c;
-
-            if (!isValid(r, c)) {
-                cout << "Invalid position!\n";
-                continue;
+    
+            int r = -1, c = -1;
+            while (true) {
+                cout << "Enter row and column (e.g. '3 5'): ";
+                string coordInput;
+                getline(cin, coordInput);
+    
+                stringstream ss(coordInput);
+                if (!(ss >> r >> c)) {
+                    cout << "Invalid input! Please enter TWO numbers separated by space.\n";
+                    continue;
+                }
+    
+                string remaining;
+                if (ss >> remaining) {
+                    cout << "Invalid input! Only two numbers allowed (e.g. '3 5').\n";
+                    continue;
+                }
+    
+                if (!isValid(r, c)) {
+                    cout << "Invalid position! Row  and column must be 0-" << (rows-1) << ".\n";
+                    continue;
+                }
+    
+                break;
             }
-
-            if (cmd == 'r') {
+    
+            if (cmd[0] == 'r') {
                 if (flagged[r][c]) {
                     cout << "Cell is flagged. Unflag it first.\n";
                     continue;
@@ -210,14 +261,15 @@ public:
                     printBoard(true);
                     return;
                 }
-            } else if (cmd == 'f') {
+            } 
+            else if (cmd[0] == 'f') {
                 if (!revealed[r][c]) {
                     flagged[r][c] = !flagged[r][c];
                 } else {
                     cout << "Cannot flag a revealed cell.\n";
                 }
             }
-
+    
             if (checkWin()) {
                 gameWon = true;
                 totalScore += score;
@@ -230,6 +282,7 @@ public:
     }
 
     void showMenu() {
+        loadScore(); 
         while (true) {
             cout << "\n=== Minesweeper ===\n";
             cout << "Total Score: " << totalScore << "\n";
@@ -266,6 +319,7 @@ public:
                 } else if (choice >= 1 && choice <= 4) {
                     setDifficulty(choice);
                     play();
+                    saveScore(); 
                     break;
                 } else {
                     cout << "Invalid choice! Please enter a number between 1 and 5.\n";
