@@ -4,6 +4,7 @@
 #include <ctime>
 #include <iomanip>
 #include <string>
+#include <limits>
 
 using namespace std;
 
@@ -113,21 +114,21 @@ public:
                 score = 3;
                 break;
             case 2: // Medium
-                rows = 16;
-                cols = 16;
-                mines = 40;
+                rows = 9;
+                cols = 9;
+                mines = 20;
                 score = 5;
                 break;
             case 3: // Hard
-                rows = 16;
-                cols = 30;
-                mines = 99;
+                rows = 12;
+                cols = 12;
+                mines = 45;
                 score = 8;
                 break;
             case 4: // Expert
-                rows = 20;
-                cols = 40;
-                mines = 180;
+                rows = 12;
+                cols = 12;
+                mines = 58;
                 score = 10;
                 break;
             default:
@@ -177,9 +178,14 @@ public:
             cout << "Total Score: " << totalScore << "\n";
             cout << "Current game score: " << score << "\n";
             cout << "Enter command (r for reveal, f for flag/unflag, q to quit): ";
-            char cmd;
-            cin >> cmd;
 
+            string input;
+            getline(cin, input);
+            if (input.empty()) {
+                continue;
+            }
+
+            char cmd = input[0];
             if (cmd == 'q') {
                 return;
             }
@@ -228,22 +234,42 @@ public:
             cout << "\n=== Minesweeper ===\n";
             cout << "Total Score: " << totalScore << "\n";
             cout << "1. Easy (9x9, 10 mines) - 3 points\n";
-            cout << "2. Medium (16x16, 40 mines) - 5 points\n";
-            cout << "3. Hard (16x30, 99 mines) - 8 points\n";
-            cout << "4. Expert (20x40, 180 mines) - 10 points\n";
+            cout << "2. Medium (9x9, 20 mines) - 5 points\n";
+            cout << "3. Hard (12x12, 45 mines) - 8 points\n";
+            cout << "4. Expert (12x12, 60 mines) - 10 points\n";
             cout << "5. Quit\n";
-            cout << "Select difficulty: ";
-
-            int choice;
-            cin >> choice;
-
-            if (choice == 5) {
-                break;
-            } else if (choice >= 1 && choice <= 4) {
-                setDifficulty(choice);
-                play();
-            } else {
-                cout << "Invalid choice!\n";
+    
+            while (true) {
+                cout << "Select difficulty level (1-5): ";
+                string input;
+                getline(cin, input);
+    
+                if (input.empty()) {
+                    continue;
+                }
+    
+                bool is_valid = true;
+                for (char c : input) {
+                    if (!isdigit(c)) {
+                        is_valid = false;
+                        break;
+                    }
+                }
+                if (!is_valid) {
+                    cout << "Invalid input! Please enter a number between 1 and 5.\n";
+                    continue;
+                }
+    
+                int choice = stoi(input);
+                if (choice == 5) {
+                    return;
+                } else if (choice >= 1 && choice <= 4) {
+                    setDifficulty(choice);
+                    play();
+                    break;
+                } else {
+                    cout << "Invalid choice! Please enter a number between 1 and 5.\n";
+                }
             }
         }
     }
