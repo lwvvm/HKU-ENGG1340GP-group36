@@ -7,6 +7,12 @@
 #include <limits>
 #include <fstream>
 
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <unistd.h>
+#endif
+
 using namespace std;
 
 class Minesweeper {
@@ -100,22 +106,39 @@ private:
         cout << "\n";
     }
 
-    const std::string SCORE_FILE = "minesweeper_score.txt";
+    std::string getMachineName() {
+        std::string name;
+        
+        // Windows 获取计算机名
+        #ifdef _WIN32
+        char computerName[MAX_COMPUTERNAME_LENGTH + 1];
+        DWORD size = sizeof(computerName);
+        GetComputerNameA(computerName, &size);
+        name = "win_" + std::string(computerName);
+        
+        // macOS/Linux 获取主机名
+        #else
+        har hostname[256];
+        gethostname(hostname, sizeof(hostname));
+        name = "mac_" + std::string(hostname);
+        #endif
+        
+        return name;
+    }
+
+    std::string scoreFile = "minesweeper_score_" + getMachineName() + ".txt";
 
     void saveScore() {
-        std::ofstream file(SCORE_FILE);
-        if (file.is_open()) {
-            file << totalScore;
-        }
+        std::ofstream file(scoreFile);
+        if (file) file << totalScore;
     }
 
-    
     void loadScore() {
-        std::ifstream file(SCORE_FILE);
-        if (file.is_open()) {
-            file >> totalScore;
-        }
+        std::ifstream file(scoreFile);
+        if (file) file >> totalScore;
+        else totalScore = 0;
     }
+
 
 public:
     Minesweeper() : rows(9), cols(9), mines(10), score(0), totalScore(0), gameOver(false), gameWon(false) {
@@ -151,7 +174,7 @@ public:
             case 4: // Expert
                 rows = 12;
                 cols = 12;
-                mines = 58;
+                mines = 60;
                 score = 10;
                 break;
             default:
