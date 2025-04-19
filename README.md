@@ -1,1 +1,2 @@
-# HKU-ENGG1340GP-group36
+# Minesweeper
+## ENGG1340 Gourp Porjrct ---- Group36
