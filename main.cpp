@@ -28,11 +28,15 @@ private:
     bool gameOver;
     bool gameWon;
 
+    time_t startTime;
+    time_t endTime;
+
     void initializeGrid() {
         mineGrid.assign(rows, vector<bool>(cols, false));
         revealed.assign(rows, vector<bool>(cols, false));
         flagged.assign(rows, vector<bool>(cols, false));
         gameOver = false;
+        startTime = time(nullptr);
         gameWon = false;
 
         // Place mines randomly
@@ -109,16 +113,14 @@ private:
     std::string getMachineName() {
         std::string name;
         
-        // Windows 获取计算机名
         #ifdef _WIN32
         char computerName[MAX_COMPUTERNAME_LENGTH + 1];
         DWORD size = sizeof(computerName);
         GetComputerNameA(computerName, &size);
         name = "win_" + std::string(computerName);
         
-        // macOS/Linux 获取主机名
         #else
-        har hostname[256];
+        char hostname[256];
         gethostname(hostname, sizeof(hostname));
         name = "mac_" + std::string(hostname);
         #endif
@@ -130,14 +132,39 @@ private:
 
     void saveScore() {
         std::ofstream file(scoreFile);
-        if (file) file << totalScore;
+        if (file) {
+            file << totalScore << "\n";
+            file << rows << " " << cols << " " << mines << "\n";
+            for (int r = 0; r < rows; ++r) {
+                for (int c = 0; c < cols; ++c) {
+                    file << mineGrid[r][c] << " ";
+                }
+                file << "\n";
+            }
+        }
     }
 
     void loadScore() {
         std::ifstream file(scoreFile);
-        if (file) file >> totalScore;
-        else totalScore = 0;
-    }
+        if (file) {
+            file >> totalScore;
+            if (file >> rows >> cols >> mines) {
+                mineGrid.assign(rows, vector<bool>(cols, false));
+                revealed.assign(rows, vector<bool>(cols, false));
+                flagged.assign(rows, vector<bool>(cols, false));
+                for (int r = 0; r < rows; ++r) {
+                    for (int c = 0; c < cols; ++c) {
+                        int val;
+                        if (file >> val) {
+                            mineGrid[r][c] = val;
+                        }
+                    }
+                }
+            }
+        } else {
+            totalScore = 0;
+        }
+    }    
 
 
 public:
@@ -207,10 +234,23 @@ public:
                 } else {
                     int count = countAdjacentMines(r, c);
                     if (count > 0) {
-                        cout << " " << count << " |";
+                        string color;
+                        switch (count) {
+                            case 1: color = "\033[1;34m"; break; // blue
+                            case 2: color = "\033[1;32m"; break; // green
+                            case 3: color = "\033[1;31m"; break; // red
+                            case 4: color = "\033[1;35m"; break; // purple
+                            case 5: color = "\033[1;33m"; break; // yellow
+                            case 6: color = "\033[1;36m"; break; // cyan
+                            case 7: color = "\033[1;37m"; break; // white
+                            case 8: color = "\033[1;90m"; break; // grey
+                            default: color = "\033[0m"; break;
+                        }
+                        cout << " " << color << count << "\033[0m |"; 
                     } else {
                         cout << "   |";
                     }
+
                 }
             }
             cout << "\n";
@@ -280,7 +320,9 @@ public:
                 }
                 revealCell(r, c);
                 if (gameOver) {
-                    cout << "Game Over! You hit a mine.\n";
+                    endTime = time(nullptr);
+                    cout << "\033[1;31mGame Over! You hit a mine.\033[0m\n";
+                    cout << "\033[1;31mTime spent: " << difftime(endTime, startTime) << " seconds.\033[0m\n";
                     printBoard(true);
                     return;
                 }
@@ -294,10 +336,12 @@ public:
             }
     
             if (checkWin()) {
+                endTime = time(nullptr);
                 gameWon = true;
                 totalScore += score;
-                cout << "Congratulations! You won!\n";
-                cout << "You earned " << score << " points!\n";
+                cout << "\033[1;32mCongratulations! You won!\033[0m\n";
+                cout << "\033[1;32mYou earned " << score << " points!\033[0m\n";
+                cout << "\033[1;32mTime spent: " << difftime(endTime, startTime) << " seconds.\033[0m\n";
                 printBoard(true);
                 return;
             }
