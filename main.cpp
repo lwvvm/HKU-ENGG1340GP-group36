@@ -6,6 +6,7 @@
 #include <string>
 #include <limits>
 #include <fstream>
+#include <sstream>
 
 #ifdef _WIN32
 #include <windows.h>
