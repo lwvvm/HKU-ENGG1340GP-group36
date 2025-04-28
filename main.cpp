@@ -361,10 +361,27 @@ public:
             if (checkWin()) {
                 endTime = time(nullptr);
                 gameWon = true;
+                
+                double timeSpent = difftime(endTime, startTime);
+                cout << "\033[1;31mCongratulations! You won!\033[0m\n";
+                cout << "\033[1;31mTime spent: " << timeSpent << " seconds.\033[0m\n";
+
+                if (rows == 9 && cols == 9 && mines == 10 && timeSpent < 300) {
+                    score += 4; // Easy 
+                    cout << "\033[1;33mBonus! You completed the game in less than 300 seconds. Your score is doubled!\033[0m\n";
+                } else if (rows == 9 && cols == 9 && mines == 20 && timeSpent < 600) {
+                    score += 5; // Medium
+                    cout << "\033[1;33mBonus! You completed the game in less than 600 seconds. You earned 10 extra points!\033[0m\n";
+                } else if (rows == 12 && cols == 12 && mines == 45 && timeSpent < 1200) {
+                    score += 8; // Hard 
+                    cout << "\033[1;33mBonus! You completed the game in less than 1200 seconds. You earned 16 extra points!\033[0m\n";
+                } else if (rows == 12 && cols == 12 && mines == 60 && timeSpent < 2000) {
+                    score += 10; // Expert 
+                    cout << "\033[1;33mBonus! You completed the game in less than 2000 seconds. You earned 20 extra points!\033[0m\n";
+                }
+    
                 totalScore += score;
-                cout << "\033[1;32mCongratulations! You won!\033[0m\n";
-                cout << "\033[1;32mYou earned " << score << " points!\033[0m\n";
-                cout << "\033[1;32mTime spent: " << difftime(endTime, startTime) << " seconds.\033[0m\n";
+                cout << "\033[1;31mYou earned " << score << " points!\033[0m\n";
                 printBoard(true);
                 return;
             }
