@@ -6,8 +6,8 @@
 // Function declaration
 void useMineRevealer(
     int &totalScore,                   // Total score (modified)
-    std::vector<std::vector<bool>> &revealed, // Revealed grid (modified)
-    const std::vector<std::vector<bool>> &mineGrid, // Mine positions (read-only)
+    std::vector<std::vector<bool> > &revealed, // Revealed grid (modified)
+    const std::vector<std::vector<bool> > &mineGrid, // Mine positions (read-only)
     int rows,                          // Number of rows
     int cols                           // Number of columns
 );

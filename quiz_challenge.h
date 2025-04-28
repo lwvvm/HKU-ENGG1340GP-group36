@@ -28,11 +28,6 @@ public:
     void resetScore();
 
     void showQuizChallengeMenu(int& mainGameScore);
-    
-    // For potential future expansion
-    void addQuestion(const std::string& question, 
-                    const std::string options[4], 
-                    int correctAnswer);
 };
 
 #endif 
