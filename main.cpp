@@ -15,7 +15,7 @@
 #endif
 #include "shop_menu.h"
 #include "detectItem.h"
-//#include "quiz_challenge.h"
+#include "quiz_challenge.h"
 
 using namespace std;
 
@@ -38,6 +38,8 @@ private:
 
     time_t startTime;
     time_t endTime;
+
+    QuizChallenge quizChallenge;
 
     void initializeGrid() {
         mineGrid.assign(rows, vector<bool>(cols, false));
@@ -142,6 +144,7 @@ private:
         std::ofstream file(scoreFile);
         if (file) {
             file << totalScore << "\n";
+            file << quizChallenge.getQuizScore() << "\n";
             file << rows << " " << cols << " " << mines << "\n";
             for (int r = 0; r < rows; ++r) {
                 for (int c = 0; c < cols; ++c) {
@@ -156,6 +159,10 @@ private:
         std::ifstream file(scoreFile);
         if (file) {
             file >> totalScore;
+            int quizScore;
+            file >> quizScore;
+            quizChallenge.setQuizScore(quizScore);
+
             if (file >> rows >> cols >> mines) {
                 mineGrid.assign(rows, vector<bool>(cols, false));
                 revealed.assign(rows, vector<bool>(cols, false));
@@ -453,8 +460,7 @@ public:
                 } 
                 else if (choice == 3) {
                     // Challenge Quiz
-                    cout << "invalid yet" << endl;
-                    //quizGame.showQuizChallengeMenu(totalScore);
+                    quizChallenge.showQuizChallengeMenu(totalScore);
                     break;
                 }
 

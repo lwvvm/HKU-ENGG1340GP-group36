@@ -6,6 +6,8 @@
 
 class QuizChallenge {
 private:
+    int QuizScore;
+
     struct Question {
         std::string question;
         std::string options[4];
@@ -13,7 +15,6 @@ private:
     };
 
     std::vector<Question> questionBank;
-    int totalScore;
 
     void initializeQuestionBank();
 
@@ -22,7 +23,8 @@ public:
     
     bool runQuiz();  
     void addScore(int points);
-    int getTotalScore() const;
+    int getQuizScore() const;
+    void setQuizScore(int score);
     void resetScore();
 
     void showQuizChallengeMenu(int& mainGameScore);

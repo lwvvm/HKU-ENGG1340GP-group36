@@ -5,7 +5,7 @@
 #include <string>
 #include <sstream>
 
-QuizChallenge::QuizChallenge() : totalScore(0) {
+QuizChallenge::QuizChallenge() : QuizScore(0) {
     srand(time(0));
     initializeQuestionBank();
 }
@@ -67,7 +67,7 @@ bool QuizChallenge::runQuiz() {
     }
 
     if (answer-1 == q.correctAnswer) {
-        totalScore += 2; // Award 2 points for correct answer
+        QuizScore += 2; // Award 2 points for correct answer
         std::cout << "\033[1;32mCorrect! You earned 2 points.\033[0m\n";
         return true;
     } else {
@@ -78,15 +78,19 @@ bool QuizChallenge::runQuiz() {
 }
 
 void QuizChallenge::addScore(int points) {
-    totalScore += points;
+    QuizScore += points;
 }
 
-int QuizChallenge::getTotalScore() const {
-    return totalScore;
+int QuizChallenge::getQuizScore() const {
+    return QuizScore;
+}
+
+void QuizChallenge::setQuizScore(int score) {
+    QuizScore = score;
 }
 
 void QuizChallenge::resetScore() {
-    totalScore = 0;
+    QuizScore = 0;
 }
 
 void QuizChallenge::addQuestion(const std::string& question, 
@@ -104,7 +108,7 @@ void QuizChallenge::addQuestion(const std::string& question,
 void QuizChallenge::showQuizChallengeMenu(int& mainGameScore) {
     while (true) {
         std::cout << "\n=== Quiz Challenge ===\n";
-        std::cout << "Quiz Score: " << getTotalScore() << "\n";
+        std::cout << "Score Earned by Quiz: " << getQuizScore() << "\n";
         std::cout << "Main Game Score: " << mainGameScore << "\n";
         std::cout << "1. Answer a question (earn 2 points if correct)\n";
         std::cout << "2. Back to main menu\n";
