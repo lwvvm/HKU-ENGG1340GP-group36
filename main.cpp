@@ -13,6 +13,7 @@
 #else
 #include <unistd.h>
 #endif
+#include "shop_menu.h"
 
 using namespace std;
 
@@ -23,6 +24,10 @@ private:
     int mines;
     int score;
     int totalScore;
+    int TemporaryInvincibility;
+    int AutoSweep;
+    int MineScanner;
+    int ExtraHint;
     vector<vector<bool>> mineGrid;
     vector<vector<bool>> revealed;
     vector<vector<bool>> flagged;
@@ -111,8 +116,8 @@ private:
         cout << "\n";
     }
 
-    std::string getMachineName() {
-        std::string name;
+    string getMachineName() {
+        string name;
         
         #ifdef _WIN32
         char computerName[MAX_COMPUTERNAME_LENGTH + 1];
@@ -129,7 +134,7 @@ private:
         return name;
     }
 
-    std::string scoreFile = "minesweeper_score_" + getMachineName() + ".txt";
+    string scoreFile = "minesweeper_score_" + getMachineName() + ".txt";
 
     void saveScore() {
         std::ofstream file(scoreFile);
@@ -169,14 +174,17 @@ private:
 
 
 public:
-    Minesweeper() : rows(9), cols(9), mines(10), score(0), totalScore(0), gameOver(false), gameWon(false) {
+    Minesweeper() : rows(9), cols(9), mines(10), score(0), totalScore(0), gameOver(false), gameWon(false),
+                    TemporaryInvincibility(0), AutoSweep(0), MineScanner(0), ExtraHint(0) {
         srand(time(0));
         initializeGrid();
         loadScore();
+        loadItems(TemporaryInvincibility, AutoSweep, MineScanner, ExtraHint);
     }
 
     ~Minesweeper() {
         saveScore();
+        saveItems(TemporaryInvincibility, AutoSweep, MineScanner, ExtraHint);
     }
 
     void setDifficulty(int level) {
@@ -267,7 +275,7 @@ public:
     
             string cmd;
             while (true) {
-                cout << "Enter command (r for reveal, f for flag/unflag, q to quit): ";
+                cout << "Enter command (r for reveal, f for flag/unflag, s for shop, q to quit): ";
                 getline(cin, cmd);
                     
                 cmd.erase(0, cmd.find_first_not_of(" \t"));
@@ -277,15 +285,20 @@ public:
                     continue;
                 }
     
-                if (cmd.size() == 1 && (cmd[0] == 'r' || cmd[0] == 'f' || cmd[0] == 'q')) {
+                if (cmd.size() == 1 && (cmd[0] == 'r' || cmd[0] == 'f' || cmd[0] == 'q' || cmd[0] == 's')) {
                     break;
                 } else {
-                    cout << "Invalid command! Please enter ONLY 'r', 'f' or 'q'.\n";
+                    cout << "\033[1;32mInvalid command! Please enter ONLY 'r', 'f', 's' or 'q'.\033[0m\n";
                 }
             }
     
             if (cmd[0] == 'q') {
                 return;
+            }
+            
+            if (cmd[0] == 's') {
+                shop_menu(totalScore, TemporaryInvincibility, AutoSweep, MineScanner, ExtraHint);
+                continue;
             }
     
             int r = -1, c = -1;
@@ -296,18 +309,18 @@ public:
     
                 stringstream ss(coordInput);
                 if (!(ss >> r >> c)) {
-                    cout << "Invalid input! Please enter TWO numbers separated by space.\n";
+                    cout << "\033[1;32mInvalid input! Please enter TWO numbers separated by space.\033[0m\n";
                     continue;
                 }
     
                 string remaining;
                 if (ss >> remaining) {
-                    cout << "Invalid input! Only two numbers allowed (e.g. '3 5').\n";
+                    cout << "\033[1;32mInvalid input! Only two numbers allowed (e.g. '3 5').\033[0m\n";
                     continue;
                 }
     
                 if (!isValid(r, c)) {
-                    cout << "Invalid position! Row  and column must be 0-" << (rows-1) << ".\n";
+                    cout << "\033[1;32mInvalid position! Row  and column must be 0-" << (rows-1) << ".\033[0m\n";
                     continue;
                 }
     
@@ -316,7 +329,7 @@ public:
     
             if (cmd[0] == 'r') {
                 if (flagged[r][c]) {
-                    cout << "Cell is flagged. Unflag it first.\n";
+                    cout << "\033[1;32mCell is flagged. Unflag it first.\033[0m\n";
                     continue;
                 }
                 revealCell(r, c);
@@ -332,7 +345,7 @@ public:
                 if (!revealed[r][c]) {
                     flagged[r][c] = !flagged[r][c];
                 } else {
-                    cout << "Cannot flag a revealed cell.\n";
+                    cout << "\033[1;32mCannot flag a revealed cell.\033[0m\n";
                 }
             }
     
@@ -354,14 +367,13 @@ public:
         while (true) {
             cout << "\n=== Minesweeper ===\n";
             cout << "Total Score: " << totalScore << "\n";
-            cout << "1. Easy (9x9, 10 mines) - 3 points\n";
-            cout << "2. Medium (9x9, 20 mines) - 5 points\n";
-            cout << "3. Hard (12x12, 45 mines) - 8 points\n";
-            cout << "4. Expert (12x12, 60 mines) - 10 points\n";
-            cout << "5. Quit\n";
+            cout << "1. New Game\n";
+            cout << "2. Shop Menu\n";
+            cout << "3. Challenge Quiz" << endl;
+            cout << "4. Quit\n";
     
             while (true) {
-                cout << "Select difficulty level (1-5): ";
+                cout << "Select your choice (1-4): ";
                 string input;
                 getline(cin, input);
     
@@ -377,20 +389,74 @@ public:
                     }
                 }
                 if (!is_valid) {
-                    cout << "Invalid input! Please enter a number between 1 and 5.\n";
+                    cout << "\033[1;32mInvalid input! Please enter a number between 1 and 4.\033[0m\n";
                     continue;
                 }
     
                 int choice = stoi(input);
-                if (choice == 5) {
-                    return;
-                } else if (choice >= 1 && choice <= 4) {
-                    setDifficulty(choice);
-                    play();
-                    saveScore(); 
+                if (choice == 4) {
+                    return;// Quit the game
+                } 
+                else if (choice == 1){
+                    // Start a new game
+                    cout << "\nSelect difficulty level:\n";
+                    cout << "1. Easy (9x9, 10 mines) - 3 points\n";
+                    cout << "2. Medium (9x9, 20 mines) - 5 points\n";
+                    cout << "3. Hard (12x12, 45 mines) - 8 points\n";
+                    cout << "4. Expert (12x12, 60 mines) - 10 points\n";
+                    cout << "5. Quit\n";
+
+                    while (true) {
+                        cout << "Enter difficulty level (1-5): ";
+                        string levelInput;
+                        getline(cin, levelInput);
+    
+                        if (levelInput.empty()) {
+                            continue;
+                        }
+    
+                        bool level_valid = true;
+                        for (char c : levelInput) {
+                            if (!isdigit(c)) {
+                                level_valid = false;
+                                break;
+                            }
+                        }
+                        if (!level_valid) {
+                            cout << "\033[1;32mInvalid input! Please enter a number between 1 and 4.\033[0m\n";
+                            continue;
+                        }
+
+                        int level = stoi(levelInput);
+                        if (level == 5) {
+                            break; // Quit the game
+                        } 
+                        
+                        else if (level >= 1 && level <= 4) {
+                            setDifficulty(level);
+                            play();
+                            saveScore();
+                            break;
+                        } else {
+                            cout << "\033[1;32mInvalid choice! Please enter a number between 1 and 4.\033[0m\n";
+                        }
+                    }
                     break;
-                } else {
-                    cout << "Invalid choice! Please enter a number between 1 and 5.\n";
+                }
+
+                else if (choice == 2) {
+                    // Open shop menu
+                    shop_menu(totalScore, TemporaryInvincibility, AutoSweep, MineScanner, ExtraHint);
+                    break;
+                } 
+                else if (choice == 3) {
+                    // Challenge Quiz
+                    cout << "Challenge Quiz is not implemented yet.\n";//haven't implemented yet
+                    break;
+                }
+
+                 else {
+                    cout << "\033[1;32mInvalid choice! Please enter a number between 1 and 4.\033[0m\n";
                 }
             }
         }
@@ -400,5 +466,6 @@ public:
 int main() {
     Minesweeper game;
     game.showMenu();
+    
     return 0;
 }
