@@ -453,7 +453,8 @@ public:
                 } 
                 else if (choice == 3) {
                     // Challenge Quiz
-                    quizGame.showQuizChallengeMenu(totalScore);
+                    cout << "invalid yet" << endl;
+                    //quizGame.showQuizChallengeMenu(totalScore);
                     break;
                 }
 
