@@ -30,9 +30,9 @@ private:
     int AutoSweep;
     int MineScanner;
     int ExtraHint;
-    vector<vector<bool>> mineGrid;
-    vector<vector<bool>> revealed;
-    vector<vector<bool>> flagged;
+    vector<vector<bool> > mineGrid;
+    vector<vector<bool> > revealed;
+    vector<vector<bool> > flagged;
     bool gameOver;
     bool gameWon;
 

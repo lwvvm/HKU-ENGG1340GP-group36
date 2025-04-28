@@ -39,12 +39,14 @@ void QuizChallenge::initializeQuestionBank() {
 
 bool QuizChallenge::runQuiz() {
     if (questionBank.empty()) {
-        std::cout << "No questions available!\n";
+        std::cout << "You've answered all available questions!\n";
         return false;
     }
 
     int randomIndex = rand() % questionBank.size();
     Question q = questionBank[randomIndex];
+
+    questionBank.erase(questionBank.begin() + randomIndex);
 
     std::cout << "\nQuestion: " << q.question << "\n";
     for (int i = 0; i < 4; i++) {
@@ -67,7 +69,7 @@ bool QuizChallenge::runQuiz() {
     }
 
     if (answer-1 == q.correctAnswer) {
-        QuizScore += 2; // Award 2 points for correct answer
+        QuizScore += 2; 
         std::cout << "\033[1;32mCorrect! You earned 2 points.\033[0m\n";
         return true;
     } else {
@@ -93,18 +95,6 @@ void QuizChallenge::resetScore() {
     QuizScore = 0;
 }
 
-void QuizChallenge::addQuestion(const std::string& question, 
-                              const std::string options[4], 
-                              int correctAnswer) {
-    Question newQ;
-    newQ.question = question;
-    for (int i = 0; i < 4; i++) {
-        newQ.options[i] = options[i];
-    }
-    newQ.correctAnswer = correctAnswer;
-    questionBank.push_back(newQ);
-}
-
 void QuizChallenge::showQuizChallengeMenu(int& mainGameScore) {
     while (true) {
         std::cout << "\n=== Quiz Challenge ===\n";
@@ -112,6 +102,7 @@ void QuizChallenge::showQuizChallengeMenu(int& mainGameScore) {
         std::cout << "Main Game Score: " << mainGameScore << "\n";
         std::cout << "1. Answer a question (earn 2 points if correct)\n";
         std::cout << "2. Back to main menu\n";
+        std::cout << "Questions remaining: " << questionBank.size() << "\n";
 
         std::string input;
         std::cout << "Select option: ";
@@ -119,7 +110,7 @@ void QuizChallenge::showQuizChallengeMenu(int& mainGameScore) {
 
         if (input == "1") {
             if (runQuiz()) {
-                mainGameScore += 2; // Update the main game score directly
+                mainGameScore += 2; 
             }
         } else if (input == "2") {
             break;
