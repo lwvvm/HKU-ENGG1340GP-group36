@@ -14,6 +14,8 @@
 #include <unistd.h>
 #endif
 #include "shop_menu.h"
+#include "detectItem.h"
+//#include "quiz_challenge.h"
 
 using namespace std;
 
@@ -451,7 +453,7 @@ public:
                 } 
                 else if (choice == 3) {
                     // Challenge Quiz
-                    cout << "Challenge Quiz is not implemented yet.\n";//haven't implemented yet
+                    quizGame.showQuizChallengeMenu(totalScore);
                     break;
                 }
 
