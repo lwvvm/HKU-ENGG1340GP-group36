@@ -528,13 +528,8 @@ public:
                 continue;
             }
 
-            else if (choice == 2) {
-                // Challenge Quiz
-                quizChallenge.showQuizChallengeMenu(totalScore);
-                break;
-            }
             else if (choice == 4) {
-                guide();
+                quizChallenge.showQuizChallengeMenu(totalScore);
                 break;
             }
             else if (choice == 5) {
