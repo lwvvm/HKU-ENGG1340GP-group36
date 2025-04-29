@@ -22,10 +22,10 @@ private:
     int mines;
     int score;
     int totalScore;
+    double totalPlayTime;
     int TemporaryInvincibility;
     int AutoSweep;
     int Hint;
-    double totalPlayTime;
     vector<vector<bool> > mineGrid;
     vector<vector<bool> > revealed;
     vector<vector<bool> > flagged;
@@ -201,8 +201,8 @@ private:
 
 
 public:
-    Minesweeper() : rows(9), cols(9), mines(10), score(0), totalScore(0), TemporaryInvincibility(0), AutoSweep(0), 
-                    Hint(0), gameOver(false), gameWon(false), totalPlayTime(0) {
+    Minesweeper() : rows(9), cols(9), mines(10), score(0), totalScore(0), totalPlayTime(0), TemporaryInvincibility(0), AutoSweep(0), 
+                    Hint(0), gameOver(false), gameWon(false) {
         srand(time(0));
         initializeGrid();
         loadItems(TemporaryInvincibility, AutoSweep, Hint);
@@ -305,7 +305,7 @@ public:
     
             string cmd;
             while (true) {
-                cout << "Enter command (r for reveal, f for flag/unflag, s for shop, q to quit): ";
+                cout << "Enter command (r for reveal, f for flag/unflag, s for shop, q to save and quit): ";
                 getline(cin, cmd);
                 
     
@@ -422,7 +422,7 @@ public:
             cout << "\n=== Minesweeper ===\n";
             cout << "Total Score: " << totalScore << "\n";
             cout << "1. New Game\n";
-            cout << "2. Continue Last Gmae\n";
+            cout << "2. Continue Last Game\n";
             cout << "3. Shop Menu\n";
             cout << "4. Challenge Quiz" << endl;
             cout << "5. Gameplay Introduction\n"; 
