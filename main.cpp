@@ -8,13 +8,8 @@
 #include <fstream>
 #include <sstream>
 
-#ifdef _WIN32
-#include <windows.h>
-#else
-#include <unistd.h>
-#endif
 #include "shop_menu.h"
-#include "detectItem.h"
+#include "Item.h"
 #include "quiz_challenge.h"
 #include "guide.h"
 
@@ -30,14 +25,13 @@ private:
     int TemporaryInvincibility;
     int AutoSweep;
     int Hint;
+    double totalPlayTime;
     vector<vector<bool> > mineGrid;
     vector<vector<bool> > revealed;
     vector<vector<bool> > flagged;
     bool gameWon;
     bool gameOver;
 
-    time_t startTime;
-    time_t endTime;
 
     QuizChallenge quizChallenge;
 
@@ -46,7 +40,6 @@ private:
         revealed.assign(rows, vector<bool>(cols, false));
         flagged.assign(rows, vector<bool>(cols, false));
         gameOver = false;
-        startTime = time(nullptr);
         gameWon = false;
 
         // Place mines randomly
@@ -119,84 +112,110 @@ private:
         }
         cout << "\n";
     }
-
-    string getMachineName() {
-        string name;
-        
-        #ifdef _WIN32
-        char computerName[MAX_COMPUTERNAME_LENGTH + 1];
-        DWORD size = sizeof(computerName);
-        GetComputerNameA(computerName, &size);
-        name = "win_" + std::string(computerName);
-        
-        #else
-        char hostname[256];
-        gethostname(hostname, sizeof(hostname));
-        name = "mac_" + std::string(hostname);
-        #endif
-        
-        return name;
-    }
-
-    string scoreFile = "minesweeper_score_" + getMachineName() + ".txt";
-
-    void saveScore() {
-        std::ofstream file(scoreFile);
+  
+    void saveGameState() {
+        std::ofstream file("saved_game_state.txt");
         if (file) {
-            file << totalScore << "\n";
-            file << quizChallenge.getQuizScore() << "\n";
             file << rows << " " << cols << " " << mines << "\n";
+            file << totalScore << "\n";
+            file << TemporaryInvincibility << " " << AutoSweep << " " << Hint << "\n";
+            file << totalPlayTime << "\n";
             for (int r = 0; r < rows; ++r) {
                 for (int c = 0; c < cols; ++c) {
                     file << mineGrid[r][c] << " ";
                 }
                 file << "\n";
             }
-        }
+            for (int r = 0; r < rows; ++r) {
+                for (int c = 0; c < cols; ++c) {
+                    file << revealed[r][c] << " ";
+                }
+                file << "\n";
+            }
+            for (int r = 0; r < rows; ++r) {
+                for (int c = 0; c < cols; ++c) {
+                    file << flagged[r][c] << " ";
+                }
+                file << "\n";
+            }
+            file.close();
+        } 
     }
 
-    void loadScore() {
-        std::ifstream file(scoreFile);
+    bool loadGameState() {
+        std::ifstream file("saved_game_state.txt");
         if (file) {
+            file >> rows >> cols >> mines;
             file >> totalScore;
-            int quizScore;
-            file >> quizScore;
-            quizChallenge.setQuizScore(quizScore);
+            file >> TemporaryInvincibility >> AutoSweep >> Hint;
+            file >> totalPlayTime;
 
-            if (file >> rows >> cols >> mines) {
-                mineGrid.assign(rows, vector<bool>(cols, false));
-                revealed.assign(rows, vector<bool>(cols, false));
-                flagged.assign(rows, vector<bool>(cols, false));
-                for (int r = 0; r < rows; ++r) {
-                    for (int c = 0; c < cols; ++c) {
-                        int val;
-                        if (file >> val) {
-                            mineGrid[r][c] = val;
-                        }
+            mineGrid.assign(rows, vector<bool>(cols, false));
+            revealed.assign(rows, vector<bool>(cols, false));
+            flagged.assign(rows, vector<bool>(cols, false));
+
+            for (int r = 0; r < rows; ++r) {
+                for (int c = 0; c < cols; ++c) {
+                    int val;
+                    if (file >> val) {
+                        mineGrid[r][c] = val;
+                    }
+                    else {
+                        cout << "\033[1;31mError: Failed to load mineGrid.\033[0m\n";
+                        return false;
                     }
                 }
             }
+            for (int r = 0; r < rows; ++r) {
+                for (int c = 0; c < cols; ++c) {
+                    int val;
+                    if (file >> val) {
+                        revealed[r][c] = val;
+                    }
+                    else {
+                        cout << "\033[1;31mError: Failed to load mineGrid.\033[0m\n";
+                        return false;
+                    }
+                }
+            }
+            for (int r = 0; r < rows; ++r) {
+                for (int c = 0; c < cols; ++c) {
+                    int val;
+                    if (file >> val) {
+                        flagged[r][c] = val;
+                    }
+                    else {
+                        cout << "\033[1;31mError: Failed to load mineGrid.\033[0m\n";
+                        return false;
+                    }
+                }
+            }
+            file.close();
+            return true;
+
         } else {
-            totalScore = 0;
+            cout << "\033[1;31mError: Unable to load game state.\033[0m\n";
+            return false;
         }
-    }    
+    }
 
 
 public:
     Minesweeper() : rows(9), cols(9), mines(10), score(0), totalScore(0), TemporaryInvincibility(0), AutoSweep(0), 
-                    Hint(0), gameOver(false), gameWon(false) {
+                    Hint(0), gameOver(false), gameWon(false), totalPlayTime(0) {
         srand(time(0));
         initializeGrid();
-        loadScore();
         loadItems(TemporaryInvincibility, AutoSweep, Hint);
+        loadGameState();
     }
 
     ~Minesweeper() {
-        saveScore();
+        saveGameState();
         saveItems(TemporaryInvincibility, AutoSweep, Hint);
     }
 
     void setDifficulty(int level) {
+        totalPlayTime = 0; // Reset play time for new game
         switch (level) {
             case 1: // Easy
                 rows = 9;
@@ -277,6 +296,8 @@ public:
     }
 
     int play() {
+        time_t sessionStartTime = time(nullptr);
+
         while (!gameOver && !gameWon) {
             printBoard();
             cout << "Total Score: " << totalScore << "\n";
@@ -286,9 +307,7 @@ public:
             while (true) {
                 cout << "Enter command (r for reveal, f for flag/unflag, s for shop, q to quit): ";
                 getline(cin, cmd);
-                    
-                cmd.erase(0, cmd.find_first_not_of(" \t"));
-                cmd.erase(cmd.find_last_not_of(" \t") + 1);
+                
     
                 if (cmd.empty()) {
                     continue;
@@ -302,6 +321,12 @@ public:
             }
     
             if (cmd[0] == 'q') {
+                time_t sessionEndTime = time(nullptr);
+                totalPlayTime += difftime(sessionEndTime, sessionStartTime);
+
+                saveGameState();
+                cout << "\033[1;32mGame progress saved successfully.\033[0m\n";
+                cout << "\033[1;32mYou can continue next time!\033[0m\n";
                 return 0;//Quit the game
             }
             
@@ -343,9 +368,11 @@ public:
                 }
                 revealCell(r, c);
                 if (gameOver) {
-                    endTime = time(nullptr);
+                    time_t sessionEndTime = time(nullptr);
+                    totalPlayTime += difftime(sessionEndTime, sessionStartTime); // 累加本次游戏时长
+
                     cout << "\033[1;31mGame Over! You hit a mine.\033[0m\n";
-                    cout << "\033[1;31mTime spent: " << difftime(endTime, startTime) << " seconds.\033[0m\n";
+                    cout << "\033[1;31mTime spent: " << totalPlayTime << " seconds.\033[0m\n";
                     printBoard(true);
                     return 1;// Game over, return to difficulty selection
                 }
@@ -359,24 +386,24 @@ public:
             }
     
             if (checkWin()) {
-                endTime = time(nullptr);
-                gameWon = true;
+                time_t sessionEndTime = time(nullptr);
+                totalPlayTime += difftime(sessionEndTime, sessionStartTime); // 累加本次游戏时长
                 
-                double timeSpent = difftime(endTime, startTime);
+                
                 cout << "\033[1;31mCongratulations! You won!\033[0m\n";
-                cout << "\033[1;31mTime spent: " << timeSpent << " seconds.\033[0m\n";
+                cout << "\033[1;31mTime spent: " << totalPlayTime << " seconds.\033[0m\n";
 
                 // Check for difficulty-specific bonuses
-                if (rows == 9 && cols == 9 && mines == 10 && timeSpent < 300) {
+                if (rows == 9 && cols == 9 && mines == 10 && totalPlayTime < 300) {
                     score += 4; // Easy 
                     cout << "\033[1;33mBonus! You completed the game in less than 300 seconds. Your score is doubled!\033[0m\n";
-                } else if (rows == 9 && cols == 9 && mines == 20 && timeSpent < 600) {
+                } else if (rows == 9 && cols == 9 && mines == 20 && totalPlayTime < 600) {
                     score += 5; // Medium
                     cout << "\033[1;33mBonus! You completed the game in less than 600 seconds. You earned 10 extra points!\033[0m\n";
-                } else if (rows == 12 && cols == 12 && mines == 45 && timeSpent < 1200) {
+                } else if (rows == 12 && cols == 12 && mines == 45 && totalPlayTime < 1200) {
                     score += 8; // Hard 
                     cout << "\033[1;33mBonus! You completed the game in less than 1200 seconds. You earned 16 extra points!\033[0m\n";
-                } else if (rows == 12 && cols == 12 && mines == 60 && timeSpent < 2000) {
+                } else if (rows == 12 && cols == 12 && mines == 60 && totalPlayTime < 2000) {
                     score += 10; // Expert 
                     cout << "\033[1;33mBonus! You completed the game in less than 2000 seconds. You earned 20 extra points!\033[0m\n";
                 }
@@ -391,110 +418,131 @@ public:
     }
 
     void showMenu() {
-        loadScore(); 
         while (true) {
             cout << "\n=== Minesweeper ===\n";
             cout << "Total Score: " << totalScore << "\n";
             cout << "1. New Game\n";
-            cout << "2. Shop Menu\n";
-            cout << "3. Challenge Quiz" << endl;
-            cout << "4. Gameplay Introduction\n"; 
-            cout << "5. Quit\n";
+            cout << "2. Continue Last Gmae\n";
+            cout << "3. Shop Menu\n";
+            cout << "4. Challenge Quiz" << endl;
+            cout << "5. Gameplay Introduction\n"; 
+            cout << "6. Quit\n";
     
-            while (true) {
-                cout << "Select your choice (1-5): ";
-                string input;
-                getline(cin, input);
-                
-                if (input.empty()) {
-                    cout << "\033[1;32mInvalid input! Please enter a number between 1 and 5.\033[0m\n";
-                    continue;
+            cout << "Select your choice (1-6): ";
+            string input;
+            getline(cin, input);
+            
+            if (input.empty()) {
+                cout << "\033[1;32mInvalid input! Please enter a number between 1 and 6.\033[0m\n";
+                continue;
+            }
+
+            bool is_valid = true;
+            for (char c : input) {
+                if (!isdigit(c)) {
+                    is_valid = false;
+                    break;
                 }
-    
-                bool is_valid = true;
-                for (char c : input) {
-                    if (!isdigit(c)) {
-                        is_valid = false;
-                        break;
+            }
+            if (!is_valid) {
+                cout << "\033[1;32mInvalid input! Please enter a number between 1 and 6.\033[0m\n";
+                continue;
+            }
+
+            int choice = stoi(input);
+            if (choice == 6) {
+                return;// Quit the game
+            } 
+
+            else if (choice == 2) {
+                // Continue last game
+                if (loadGameState()){
+                    if (gameOver){
+                        cout << "\033[1;31mYou cannot continue this game. You already lost! Please start a new game.\033[0m\n";
+                    } else if (gameWon) {
+                        cout << "\033[1;32mYou cannot continue this game. You already won! Please start a new game.\033[0m\n";
+                    }
+                    else{
+                        play();
                     }
                 }
-                if (!is_valid) {
-                    cout << "\033[1;32mInvalid input! Please enter a number between 1 and 5.\033[0m\n";
-                    continue;
+                else {
+                    cout << "\033[1;31mNo saved game found. Please start a new game.\033[0m\n";
                 }
-    
-                int choice = stoi(input);
-                if (choice == 5) {
-                    return;// Quit the game
-                } 
-                else if (choice == 1){
-                    // Start a new game        
+            }
+        
+            else if (choice == 1){
+                // Start a new game
+                while (true) {    
                     cout << "\nSelect difficulty level:\n";
                     cout << "1. Easy (9x9, 10 mines) - 3 points\n";
                     cout << "2. Medium (9x9, 20 mines) - 5 points\n";
                     cout << "3. Hard (12x12, 45 mines) - 8 points\n";
-                    cout << "4. Expert (12x12, 60 mines) - 10 points\n";
+                    cout << "4. Exprt (12x12, 60 mines) - 10 points\n";
                     cout << "5. Quit\n";  
-                             
-                    while (true) {
-                        cout << "Enter difficulty level (1-5): ";
-                        string levelInput;
-                        getline(cin, levelInput);
-    
-                        if (levelInput.empty()) {
-                            cout << "\033[1;32mInvalid input! Please enter a number between 1 and 5.\033[0m\n";
-                            continue;
-                        }
-    
-                        bool level_valid = true;
-                        for (char c : levelInput) {
-                            if (!isdigit(c)) {
-                                level_valid = false;
-                                break;
-                            }
-                        }
-                        if (!level_valid) {
-                            cout << "\033[1;32mInvalid input! Please enter a number between 1 and 5.\033[0m\n";
-                            continue;
-                        }
+                                
+                    cout << "Enter difficulty level (1-5): ";
+                    string levelInput;
+                    getline(cin, levelInput);
 
-                        int level = stoi(levelInput);
-                        if (level == 5) {
-                            break; // Quit the game
-                        } 
-                        
-                        else if (level >= 1 && level <= 4) {
-                            setDifficulty(level);
-                            int result = play();
-                            saveScore();
-                            if (result == 1) {
-                                continue; // Return to difficulty selection
-                            }
+                    if (levelInput.empty()) {
+                        cout << "\033[1;32mInvalid input! Please enter a number between 1 and 5.\033[0m\n";
+                        continue;
+                    }
+
+                    bool level_valid = true;
+                    for (char c : levelInput) {
+                        if (!isdigit(c)) {
+                            level_valid = false;
                             break;
-                        } else {
-                            cout << "\033[1;32mInvalid choice! Please enter a number between 1 and 5.\033[0m\n";
                         }
                     }
-                    break;
-                }
 
-                else if (choice == 2) {
-                    // Open shop menu
-                    shop_menu(totalScore, TemporaryInvincibility, AutoSweep, Hint);
-                    break;
-                } 
-                else if (choice == 3) {
-                    // Challenge Quiz
-                    quizChallenge.showQuizChallengeMenu(totalScore);
-                    break;
-                }
-                else if (choice == 4) {
-                    guide();
-                    break;
-                }
-                 else {
-                    cout << "\033[1;32mInvalid choice! Please enter a number between 1 and 4.\033[0m\n";
-                }
+                    if (!level_valid) {
+                        cout << "\033[1;32mInvalid input! Please enter a number between 1 and 5.\033[0m\n";
+                        continue;
+                    }
+
+                    int level = stoi(levelInput);
+                    if (level == 5) {
+                        break; // Quit the game
+                    } 
+
+                    else if (level >= 1 && level <= 4) {
+                        setDifficulty(level);
+                        int result = play();
+                        saveGameState();
+                        if (result == 1) {
+                            continue; // Return to difficulty selection
+                        }
+                        break;
+                    } else {
+                        cout << "\033[1;32mInvalid choice! Please enter a number between 1 and 5.\033[0m\n";
+                    }
+                }   
+            } 
+
+            else if (choice == 3) {
+                // Open shop menu
+                shop_menu(totalScore, TemporaryInvincibility, AutoSweep, Hint);
+                continue;
+            }
+
+            else if (choice == 2) {
+                // Challenge Quiz
+                quizChallenge.showQuizChallengeMenu(totalScore);
+                break;
+            }
+            else if (choice == 4) {
+                guide();
+                break;
+            }
+            else if (choice == 5) {
+                // Gameplay Introduction
+                guide();
+            }
+                else {
+                cout << "\033[1;32mInvalid choice! Please enter a number between 1 and 4.\033[0m\n";
             }
         }
     }
