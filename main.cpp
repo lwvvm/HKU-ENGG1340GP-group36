@@ -530,7 +530,6 @@ public:
 
             else if (choice == 4) {
                 quizChallenge.showQuizChallengeMenu(totalScore);
-                break;
             }
             else if (choice == 5) {
                 // Gameplay Introduction

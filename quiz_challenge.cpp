@@ -67,7 +67,6 @@ bool QuizChallenge::runQuiz(int& mainGameScore) {
     Question q = availableQuestions[randomIndex];
 
     while (true) {
-        // Clear screen for each new question
         #ifdef _WIN32
             system("cls");
         #else
