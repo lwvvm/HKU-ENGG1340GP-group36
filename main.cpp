@@ -29,8 +29,7 @@ private:
     int totalScore;
     int TemporaryInvincibility;
     int AutoSweep;
-    int MineScanner;
-    int ExtraHint;
+    int Hint;
     vector<vector<bool> > mineGrid;
     vector<vector<bool> > revealed;
     vector<vector<bool> > flagged;
@@ -185,16 +184,16 @@ private:
 
 public:
     Minesweeper() : rows(9), cols(9), mines(10), score(0), totalScore(0), TemporaryInvincibility(0), AutoSweep(0), 
-                    MineScanner(0), ExtraHint(0), gameOver(false), gameWon(false) {
+                    Hint(0), gameOver(false), gameWon(false) {
         srand(time(0));
         initializeGrid();
         loadScore();
-        loadItems(TemporaryInvincibility, AutoSweep, MineScanner, ExtraHint);
+        loadItems(TemporaryInvincibility, AutoSweep, Hint);
     }
 
     ~Minesweeper() {
         saveScore();
-        saveItems(TemporaryInvincibility, AutoSweep, MineScanner, ExtraHint);
+        saveItems(TemporaryInvincibility, AutoSweep, Hint);
     }
 
     void setDifficulty(int level) {
@@ -307,7 +306,7 @@ public:
             }
             
             if (cmd[0] == 's') {
-                shop_menu(totalScore, TemporaryInvincibility, AutoSweep, MineScanner, ExtraHint);
+                shop_menu(totalScore, TemporaryInvincibility, AutoSweep, Hint);
                 continue;
             }
     
@@ -405,10 +404,10 @@ public:
             while (true) {
                 cout << "Select your choice (1-5): ";
                 string input;
-                cin >> input;
-                cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Clear input buffer
+                getline(cin, input);
                 
                 if (input.empty()) {
+                    cout << "\033[1;32mInvalid input! Please enter a number between 1 and 5.\033[0m\n";
                     continue;
                 }
     
@@ -429,20 +428,21 @@ public:
                     return;// Quit the game
                 } 
                 else if (choice == 1){
-                    // Start a new game                   
+                    // Start a new game        
+                    cout << "\nSelect difficulty level:\n";
+                    cout << "1. Easy (9x9, 10 mines) - 3 points\n";
+                    cout << "2. Medium (9x9, 20 mines) - 5 points\n";
+                    cout << "3. Hard (12x12, 45 mines) - 8 points\n";
+                    cout << "4. Expert (12x12, 60 mines) - 10 points\n";
+                    cout << "5. Quit\n";  
+                             
                     while (true) {
-                        cout << "\nSelect difficulty level:\n";
-                        cout << "1. Easy (9x9, 10 mines) - 3 points\n";
-                        cout << "2. Medium (9x9, 20 mines) - 5 points\n";
-                        cout << "3. Hard (12x12, 45 mines) - 8 points\n";
-                        cout << "4. Expert (12x12, 60 mines) - 10 points\n";
-                        cout << "5. Quit\n";
-
                         cout << "Enter difficulty level (1-5): ";
                         string levelInput;
                         getline(cin, levelInput);
     
                         if (levelInput.empty()) {
+                            cout << "\033[1;32mInvalid input! Please enter a number between 1 and 5.\033[0m\n";
                             continue;
                         }
     
@@ -480,7 +480,7 @@ public:
 
                 else if (choice == 2) {
                     // Open shop menu
-                    shop_menu(totalScore, TemporaryInvincibility, AutoSweep, MineScanner, ExtraHint);
+                    shop_menu(totalScore, TemporaryInvincibility, AutoSweep, Hint);
                     break;
                 } 
                 else if (choice == 3) {
