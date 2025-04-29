@@ -34,6 +34,15 @@ void loadItems(int& TemporaryInvincibility, int& AutoSweep, int& MineScanner, in
     }
 }
 
+bool isValidNumber(const string& input) {
+    for (char c : input) {
+        if (!isdigit(c)) {
+            return false;
+        }
+    }
+    return true;
+}
+
 void shop_menu(int& totalScore, int& TemporaryInvincibility, int& AutoSweep, int& MineScanner, int& ExtraHint) {
     int choice = 0;
     while (true) {
@@ -52,6 +61,9 @@ void shop_menu(int& totalScore, int& TemporaryInvincibility, int& AutoSweep, int
         }
         
         try {
+            if (!isValidNumber(input)) {
+                throw invalid_argument("Invalid input");
+            }
             choice = stoi(input);
         } catch (...) {
             cout << "\033[1;32mInvalid input! Please enter a number between 1 and 3.\033[0m\n";
@@ -82,6 +94,9 @@ void shop_menu(int& totalScore, int& TemporaryInvincibility, int& AutoSweep, int
                     getline(cin, buyInput);
                     int buyChoice = 0;
                     try {
+                        if (!isValidNumber(buyInput)) {
+                            throw invalid_argument("Invalid input");
+                        }
                         buyChoice = stoi(buyInput);
                     } catch (...) {
                         cout << "\033[1;32mInvalid input! Please enter a number between 1 and 5.\033[0m\n";

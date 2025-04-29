@@ -454,7 +454,7 @@ public:
                             }
                         }
                         if (!level_valid) {
-                            cout << "\033[1;32mInvalid input! Please enter a number between 1 and 4.\033[0m\n";
+                            cout << "\033[1;32mInvalid input! Please enter a number between 1 and 5.\033[0m\n";
                             continue;
                         }
 
@@ -472,7 +472,7 @@ public:
                             }
                             break;
                         } else {
-                            cout << "\033[1;32mInvalid choice! Please enter a number between 1 and 4.\033[0m\n";
+                            cout << "\033[1;32mInvalid choice! Please enter a number between 1 and 5.\033[0m\n";
                         }
                     }
                     break;
