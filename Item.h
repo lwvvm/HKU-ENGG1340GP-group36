@@ -1,10 +1,10 @@
-#ifndef DETECTITEM_H
-#define DETECTITEM_H
+#ifndef ITEM_H
+#define ITEM_H
 
 #include <vector>
 
 // Function declaration
-void useMineRevealer(
+void AutoSweep(
     int &totalScore,                   // Total score (modified)
     std::vector<std::vector<bool> > &revealed, // Revealed grid (modified)
     const std::vector<std::vector<bool> > &mineGrid, // Mine positions (read-only)
@@ -28,7 +28,7 @@ if (cmd.size() == 1 && (cmd[0] == 'r' || cmd[0] == 'f' || cmd[0] == 'q' || cmd[0
 Adding:
 
 if (cmd[0] == '2') {
-    useMineRevealer(totalScore, revealed, mineGrid, rows, cols);
+    AutoSweep(totalScore, revealed, mineGrid, rows, cols);
     if (checkWin()) {
         endTime = time(nullptr);
         gameWon = true;
