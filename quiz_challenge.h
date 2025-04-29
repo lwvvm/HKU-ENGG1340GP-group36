@@ -10,6 +10,7 @@ class QuizChallenge {
 private:
     int QuizScore;
     std::unordered_set<std::string> answeredQuestions; 
+    std::string scoreFileName = "quiz_score_data.txt";
     
     struct Question {
         std::string question;
@@ -28,12 +29,13 @@ public:
     QuizChallenge();
     ~QuizChallenge();
     
-    bool runQuiz();
+    bool runQuiz(int& mainGameScore);
     void addScore(int points);
     int getQuizScore() const;
     void setQuizScore(int score);
     void resetScore();
     void showQuizChallengeMenu(int& mainGameScore);
+    void startImmediateQuiz(int& mainGameScore);
 };
 
 #endif

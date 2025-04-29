@@ -6,6 +6,7 @@
 #include <sstream>
 #include <unordered_set>
 #include <fstream>
+#include <thread> 
 
 QuizChallenge::QuizChallenge() : QuizScore(0) {
     srand(time(0));
@@ -40,7 +41,16 @@ void QuizChallenge::initializeQuestionBank() {
     };
 }
 
-bool QuizChallenge::runQuiz() {
+void QuizChallenge::startImmediateQuiz(int& mainGameScore) {
+    while (runQuiz(mainGameScore)) {}
+    
+    std::cout << "\nQuiz completed! Your total score: " << getQuizScore() << "\n";
+    std::cout << "Press Enter to return to main menu...";
+    std::string dummy;
+    getline(std::cin, dummy);
+}
+
+bool QuizChallenge::runQuiz(int& mainGameScore) {
     std::vector<Question> availableQuestions;
     for (const auto& q : questionBank) {
         if (answeredQuestions.find(q.questionId) == answeredQuestions.end()) {
@@ -56,37 +66,68 @@ bool QuizChallenge::runQuiz() {
     int randomIndex = rand() % availableQuestions.size();
     Question q = availableQuestions[randomIndex];
 
-    answeredQuestions.insert(q.questionId);
-    saveAnsweredQuestions();
-
-    std::cout << "\nQuestion: " << q.question << "\n";
-    for (int i = 0; i < 4; i++) {
-        std::cout << i+1 << ". " << q.options[i] << "\n";
-    }
-
-    int answer;
     while (true) {
-        std::cout << "Your answer (1-4): ";
+        // Clear screen for each new question
+        #ifdef _WIN32
+            system("cls");
+        #else
+            system("clear");
+        #endif
+
+        std::cout << "=== Quiz Challenge ===\n";
+        std::cout << "Rules:\n";
+        std::cout << "- Correct answer: +2 points\n";
+        std::cout << "- Wrong answer: 0 points\n";
+        std::cout << "- Type 'q' to quit\n\n";
+        std::cout << "Score Earned by Quiz: " << getQuizScore() << "\n";
+        std::cout << "Main Game Score: " << mainGameScore << "\n";
+        std::cout << "Questions remaining: " << availableQuestions.size() << "\n\n";
+
+        std::cout << "Question: " << q.question << "\n";
+        for (int i = 0; i < 4; i++) {
+            std::cout << i+1 << ". " << q.options[i] << "\n";
+        }
+
+        std::cout << "\nYour answer (1-4) or 'q' to quit: ";
         std::string input;
         getline(std::cin, input);
         
-        try {
-            answer = stoi(input);
-            if (answer >= 1 && answer <= 4) break;
-            std::cout << "Please enter a number between 1 and 4.\n";
-        } catch (...) {
-            std::cout << "Invalid input! Please enter a number.\n";
+        if (input == "q" || input == "Q") {
+            return false;
         }
-    }
 
-    if (answer-1 == q.correctAnswer) {
-        QuizScore += 2; 
-        std::cout << "\033[1;32mCorrect! You earned 2 points.\033[0m\n";
-        return true;
-    } else {
-        std::cout << "\033[1;31mIncorrect! The correct answer was: " 
-                 << q.options[q.correctAnswer] << "\033[0m\n";
-        return false;
+        try {
+            size_t pos;
+            int answer = std::stoi(input, &pos); 
+        
+            if (pos != input.length() || answer < 1 || answer > 4) {
+                throw std::invalid_argument("Invalid input");
+            }
+        
+            answeredQuestions.insert(q.questionId);
+            saveAnsweredQuestions();
+        
+            if (answer - 1 == q.correctAnswer) {
+                QuizScore += 2;
+                mainGameScore += 2;
+                std::cout << "\033[1;32mCorrect! +2 points\033[0m\n";
+            } else {
+                std::cout << "\033[1;31mIncorrect! The correct answer was: " 
+                          << q.options[q.correctAnswer] << "\033[0m\n";
+            }
+        
+            std::cout << "Press Enter to continue...";
+            std::string pause;
+            std::getline(std::cin, pause);
+            return true;
+        }
+        catch (...) {
+            std::cout << "Invalid input. Please enter a number between 1 and 4 or 'q' to quit.\n";
+            std::cout << "Press Enter to try again...";
+            std::string pause;
+            std::getline(std::cin, pause);
+        }
+        
     }
 }
 
@@ -107,7 +148,7 @@ void QuizChallenge::resetScore() {
 }
 
 void QuizChallenge::loadAnsweredQuestions() {
-    std::ifstream file("minesweeper_score.txt");
+    std::ifstream file(scoreFileName);
     if (file) {
         std::string line;
         
@@ -128,7 +169,7 @@ void QuizChallenge::loadAnsweredQuestions() {
 }
 
 void QuizChallenge::saveAnsweredQuestions() {
-    std::ofstream file("minesweeper_score.txt");
+    std::ofstream file(scoreFileName);
     if (!file) {
         std::cerr << "Error: Could not save progress to minesweeper_score.txt\n";
         return;
@@ -146,32 +187,5 @@ QuizChallenge::~QuizChallenge() {
 }
 
 void QuizChallenge::showQuizChallengeMenu(int& mainGameScore) {
-    while (true) {
-        int remaining = 0;
-        for (const auto& q : questionBank) {
-            if (answeredQuestions.find(q.questionId) == answeredQuestions.end()) {
-                remaining++;
-            }
-        }
-        std::cout << "\n=== Quiz Challenge ===\n";
-        std::cout << "Score Earned by Quiz: " << getQuizScore() << "\n";
-        std::cout << "Main Game Score: " << mainGameScore << "\n";
-        std::cout << "1. Answer a question (earn 2 points if correct)\n";
-        std::cout << "2. Back to main menu\n";
-        std::cout << "Questions remaining: " << remaining << "\n";
-
-        std::string input;
-        std::cout << "Select option: ";
-        getline(std::cin, input);
-
-        if (input == "1") {
-            if (runQuiz()) {
-                mainGameScore += 2; 
-            }
-        } else if (input == "2") {
-            break;
-        } else {
-            std::cout << "Invalid option!\n";
-        }
-    }
+    startImmediateQuiz(mainGameScore); 
 }
