@@ -16,7 +16,7 @@ $(TARGET): $(OBJS)
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-//type: make clean
-//to clean up all generated files and executable
+# type: make clean
+# to clean up all generated files and executable
 clean:
 	rm -f $(OBJS) $(TARGET)
