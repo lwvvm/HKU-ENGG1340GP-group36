@@ -277,7 +277,7 @@ public:
         }
     }
 
-    void play() {
+    int play() {
         while (!gameOver && !gameWon) {
             printBoard();
             cout << "Total Score: " << totalScore << "\n";
@@ -303,7 +303,7 @@ public:
             }
     
             if (cmd[0] == 'q') {
-                return;
+                return 0;//Quit the game
             }
             
             if (cmd[0] == 's') {
@@ -348,7 +348,7 @@ public:
                     cout << "\033[1;31mGame Over! You hit a mine.\033[0m\n";
                     cout << "\033[1;31mTime spent: " << difftime(endTime, startTime) << " seconds.\033[0m\n";
                     printBoard(true);
-                    return;
+                    return 1;// Game over, return to difficulty selection
                 }
             } 
             else if (cmd[0] == 'f') {
@@ -367,6 +367,7 @@ public:
                 cout << "\033[1;31mCongratulations! You won!\033[0m\n";
                 cout << "\033[1;31mTime spent: " << timeSpent << " seconds.\033[0m\n";
 
+                // Check for difficulty-specific bonuses
                 if (rows == 9 && cols == 9 && mines == 10 && timeSpent < 300) {
                     score += 4; // Easy 
                     cout << "\033[1;33mBonus! You completed the game in less than 300 seconds. Your score is doubled!\033[0m\n";
@@ -384,9 +385,10 @@ public:
                 totalScore += score;
                 cout << "\033[1;31mYou earned " << score << " points!\033[0m\n";
                 printBoard(true);
-                return;
+                return 1; // Game won, return to difficulty selection
             }
         }
+        return 0;
     }
 
     void showMenu() {
@@ -427,15 +429,15 @@ public:
                     return;// Quit the game
                 } 
                 else if (choice == 1){
-                    // Start a new game
-                    cout << "\nSelect difficulty level:\n";
-                    cout << "1. Easy (9x9, 10 mines) - 3 points\n";
-                    cout << "2. Medium (9x9, 20 mines) - 5 points\n";
-                    cout << "3. Hard (12x12, 45 mines) - 8 points\n";
-                    cout << "4. Expert (12x12, 60 mines) - 10 points\n";
-                    cout << "5. Quit\n";
-
+                    // Start a new game                   
                     while (true) {
+                        cout << "\nSelect difficulty level:\n";
+                        cout << "1. Easy (9x9, 10 mines) - 3 points\n";
+                        cout << "2. Medium (9x9, 20 mines) - 5 points\n";
+                        cout << "3. Hard (12x12, 45 mines) - 8 points\n";
+                        cout << "4. Expert (12x12, 60 mines) - 10 points\n";
+                        cout << "5. Quit\n";
+
                         cout << "Enter difficulty level (1-5): ";
                         string levelInput;
                         getline(cin, levelInput);
@@ -463,8 +465,11 @@ public:
                         
                         else if (level >= 1 && level <= 4) {
                             setDifficulty(level);
-                            play();
+                            int result = play();
                             saveScore();
+                            if (result == 1) {
+                                continue; // Return to difficulty selection
+                            }
                             break;
                         } else {
                             cout << "\033[1;32mInvalid choice! Please enter a number between 1 and 4.\033[0m\n";
