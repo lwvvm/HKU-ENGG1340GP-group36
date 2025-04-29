@@ -16,6 +16,7 @@
 #include "shop_menu.h"
 #include "detectItem.h"
 #include "quiz_challenge.h"
+#include "guide.h"
 
 using namespace std;
 
@@ -396,10 +397,11 @@ public:
             cout << "1. New Game\n";
             cout << "2. Shop Menu\n";
             cout << "3. Challenge Quiz" << endl;
-            cout << "4. Quit\n";
+            cout << "4. Gameplay Introduction\n"; 
+            cout << "5. Quit\n";
     
             while (true) {
-                cout << "Select your choice (1-4): ";
+                cout << "Select your choice (1-5): ";
                 string input;
                 getline(cin, input);
     
@@ -415,12 +417,12 @@ public:
                     }
                 }
                 if (!is_valid) {
-                    cout << "\033[1;32mInvalid input! Please enter a number between 1 and 4.\033[0m\n";
+                    cout << "\033[1;32mInvalid input! Please enter a number between 1 and 5.\033[0m\n";
                     continue;
                 }
     
                 int choice = stoi(input);
-                if (choice == 4) {
+                if (choice == 5) {
                     return;// Quit the game
                 } 
                 else if (choice == 1){
@@ -480,7 +482,10 @@ public:
                     quizChallenge.showQuizChallengeMenu(totalScore);
                     break;
                 }
-
+                else if (choice == 4) {
+                    guide();
+                    break;
+                }
                  else {
                     cout << "\033[1;32mInvalid choice! Please enter a number between 1 and 4.\033[0m\n";
                 }
