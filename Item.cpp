@@ -1,10 +1,10 @@
-#include "detectItem.h"
+#include "Item.h"
 #include <iostream>
 #include <sstream>
 
 using namespace std;
 
-void useMineRevealer(
+void AutoSweep(
     int &totalScore,
     vector<vector<bool>> &revealed,
     const vector<vector<bool>> &mineGrid,
