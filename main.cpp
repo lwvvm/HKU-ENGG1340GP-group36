@@ -34,8 +34,8 @@ private:
     vector<vector<bool> > mineGrid;
     vector<vector<bool> > revealed;
     vector<vector<bool> > flagged;
-    bool gameOver;
     bool gameWon;
+    bool gameOver;
 
     time_t startTime;
     time_t endTime;
@@ -184,8 +184,8 @@ private:
 
 
 public:
-    Minesweeper() : rows(9), cols(9), mines(10), score(0), totalScore(0), gameOver(false), gameWon(false),
-                    TemporaryInvincibility(0), AutoSweep(0), MineScanner(0), ExtraHint(0) {
+    Minesweeper() : rows(9), cols(9), mines(10), score(0), totalScore(0), TemporaryInvincibility(0), AutoSweep(0), 
+                    MineScanner(0), ExtraHint(0), gameOver(false), gameWon(false) {
         srand(time(0));
         initializeGrid();
         loadScore();
