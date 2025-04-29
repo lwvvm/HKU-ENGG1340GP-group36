@@ -41,12 +41,12 @@ bool isValidNumber(const string& input) {
 
 void shop_menu(int& totalScore, int& TemporaryInvincibility, int& AutoSweep, int& Hint) {
     int choice = 0;
-    cout << "\n=== Shop Menu ===\n";
-    cout << "1. Buy items\n";
-    cout << "2. Items storage\n";
-    cout << "3. Exit Shop\n";
-    cout << "Total Score: " << totalScore << "\n"; 
     while (true) {
+        cout << "\n=== Shop Menu ===\n";
+        cout << "1. Buy items\n";
+        cout << "2. Items storage\n";
+        cout << "3. Exit Shop\n";
+        cout << "Total Score: " << totalScore << "\n"; 
         cout << "Select an option (1-3): ";
         
         string input;
