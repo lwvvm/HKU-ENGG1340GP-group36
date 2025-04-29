@@ -403,8 +403,9 @@ public:
             while (true) {
                 cout << "Select your choice (1-5): ";
                 string input;
-                getline(cin, input);
-    
+                cin >> input;
+                cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Clear input buffer
+                
                 if (input.empty()) {
                     continue;
                 }
