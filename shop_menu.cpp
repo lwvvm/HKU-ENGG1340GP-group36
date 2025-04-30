@@ -14,7 +14,8 @@ bool isValidNumber(const string& input) {
     return true;
 }
 
-void shop_menu(int& totalScore, int& TemporaryInvincibility, int& AutoSweep, int& Hint) {
+void shop_menu(int& totalScore, int& TemporaryInvincibility, int& AutoSweep, int& Shield) {
+    totalScore= 10000;
     int choice = 0;
     while (true) {
         cout << "\n=== Shop Menu ===\n";
@@ -57,7 +58,7 @@ void shop_menu(int& totalScore, int& TemporaryInvincibility, int& AutoSweep, int
                     cout << "Total Score: " << totalScore << endl;
                     cout << "1. Buy Temporary Invincibility (-5 points)\n";
                     cout << "2. Buy Auto Sweep (-10 points)\n";
-                    cout << "3. Buy Hint (-2 points)\n";
+                    cout << "3. Buy Shield (-10 points)\n";
                     cout << "4. Back to Shop Menu\n";
                     cout << "Select an option (1-4): ";
                     
@@ -87,7 +88,7 @@ void shop_menu(int& totalScore, int& TemporaryInvincibility, int& AutoSweep, int
                     switch (buyChoice) {
                         case 1: cost = 5; TemporaryInvincibility++; break;//ITEMS PURCHASED
                         case 2: cost = 10; AutoSweep++; break;
-                        case 3: cost = 2; Hint++; break;
+                        case 3: cost = 10; Shield++; break;
                         default:
                             cout << "\033[1;32mInvalid choice! Please enter a number between 1 and 4.\033[0m\n";
                             continue;
@@ -103,7 +104,7 @@ void shop_menu(int& totalScore, int& TemporaryInvincibility, int& AutoSweep, int
                         switch (buyChoice) {
                             case 1: TemporaryInvincibility--; break;
                             case 2: AutoSweep--; break;
-                            case 3: Hint--; break;
+                            case 3: Shield--; break;
                         }
                     } 
                 }
@@ -114,7 +115,7 @@ void shop_menu(int& totalScore, int& TemporaryInvincibility, int& AutoSweep, int
                 cout << "\n\033[1;32m=== Items Storage ===\033[0m\n";
                 cout << "\033[1;32mTemporary Invincibility: " << TemporaryInvincibility << "\033[0m\n";
                 cout << "\033[1;32mAuto Sweep: " << AutoSweep << "\033[0m\n";
-                cout << "\033[1;32mHint: " << Hint << "\033[0m\n";
+                cout << "\033[1;32mShield: " << Shield << "\033[0m\n";
                 break;
             }
             default:
