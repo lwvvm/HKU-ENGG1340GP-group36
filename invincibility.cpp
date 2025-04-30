@@ -1,18 +1,20 @@
 #include "invincibility.h"
 
-Invincibility::Invincibility() : remainingMoves(0), isActive(false) {}
+Invincibility::Invincibility() 
+    : remainingMoves(0), isActive(false) {}
 
 void Invincibility::activate(int moves) {
-    remainingMoves += moves;  // Add to existing moves (allows stacking)
+    remainingMoves = moves;
     isActive = true;
 }
 
-bool Invincibility::useMove() {
-    if (remainingMoves > 0 && isActive) {
+void Invincibility::useMove() {
+    if (remainingMoves > 0) {
         remainingMoves--;
-        return true;
     }
-    return false;
+    if (remainingMoves <= 0) {
+        deactivate();
+    }
 }
 
 bool Invincibility::isInvincible() const {
