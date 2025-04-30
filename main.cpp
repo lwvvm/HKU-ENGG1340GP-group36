@@ -305,7 +305,7 @@ public:
     
             string cmd;
             while (true) {
-                cout << "Enter command (r for reveal, f for flag/unflag, s for shop, q to save and quit): ";
+                cout << "Enter command (r for reveal, f for flag/unflag, i for items, s for shop, q to save and quit): ";
                 getline(cin, cmd);
                 
     
@@ -313,7 +313,7 @@ public:
                     continue;
                 }
     
-                if (cmd.size() == 1 && (cmd[0] == 'r' || cmd[0] == 'f' || cmd[0] == 'q' || cmd[0] == 's')) {
+                if (cmd.size() == 1 && (cmd[0] == 'r' || cmd[0] == 'f' || cmd[0] == 'q' || cmd[0] == 's' || cmd[0] == 'i')) {
                     break;
                 } else {
                     cout << "\033[1;32mInvalid command! Please enter ONLY 'r', 'f', 's' or 'q'.\033[0m\n";
@@ -334,6 +334,89 @@ public:
                 shop_menu(totalScore, TemporaryInvincibility, AutoSweep, Hint);
                 continue;
             }
+
+            if (cmd[0] == 'i') {
+                while (true) {
+                    cout << "\n=== Items Menu ===\n";
+                    cout << "1. Use Temporary Invincibility (" << TemporaryInvincibility << " available)\n";
+                    cout << "2. Use Auto Sweep (" << AutoSweep << " available)\n";
+                    cout << "3. Use Hint (" << Hint << " available)\n";
+                    cout << "4. Back to Game\n";
+                    cout << "Select an option (1-4): ";
+                
+                    string itemInput;
+                    getline(cin, itemInput);
+
+                    if (itemInput.empty()) {
+                        cout << "\033[1;32mInvalid input! Please enter a number between 1 and 4.\033[0m\n";
+                        continue;
+                    }
+
+                    bool is_valid = true;
+                    for (char c : itemInput) {
+                        if (!isdigit(c)) {
+                            is_valid = false;
+                            break;
+                        }
+                    }
+                    if (!is_valid) {
+                        cout << "\033[1;32mInvalid input! Please enter a number between 1 and 6.\033[0m\n";
+                        continue;
+                    } 
+
+                    int itemChoice = stoi(itemInput);
+                    if (itemChoice == 4) {
+                        break; // Back to game
+                    }
+            
+                    switch (itemChoice) {
+                        case 1: // Temporary Invincibility
+                            if (TemporaryInvincibility > 0) {
+                                TemporaryInvincibility--;
+                                saveItems(TemporaryInvincibility, AutoSweep, Hint); // update file
+                                cout << "\033[1;32mTemporary Invincibility activated! You are safe for the next three moves.\033[0m\n";
+                                // TODO: Add functionality for Temporary Invincibility
+                                break;
+                            } else {
+                                cout << "\033[1;31mYou don't have any Temporary Invincibility left!\033[0m\n";
+                            }
+                            break;
+
+                        case 2: // Auto Sweep
+                            if (AutoSweep > 0) {
+                                AutoSweep--;
+                                saveItems(TemporaryInvincibility, AutoSweep, Hint); // update file
+                                cout << "\033[1;32mAuto Sweep activated! All adjacent cells are revealed.\033[0m\n";
+                                // TODO: Add functionality for Hint
+                                performAutoSweep(totalScore, revealed, mineGrid, rows, cols);
+                                break;
+                            } else {
+                                cout << "\033[1;31mYou don't have any Hint left!\033[0m\n";
+                            }
+                            break;
+
+                        case 3: // Hint
+                            if (Hint > 0) {
+                                Hint--;
+                                saveItems(TemporaryInvincibility, AutoSweep, Hint); // 更新文件
+                                cout << "\033[1;32mHint activated! Revealing a safe cell.\033[0m\n";
+                                // TODO: Add functionality for Hint
+
+                                break;
+                            } else {
+                                cout << "\033[1;31mYou don't have any Hint left!\033[0m\n";
+                            }
+                            break;    
+
+                        default:
+                            cout << "\033[1;32mInvalid choice! Please enter a number between 1 and 4.\033[0m\n";
+                            break;
+                    }
+                    break; // Exit the item menu after one action
+                }
+                continue;
+            }
+      
     
             int r = -1, c = -1;
             while (true) {

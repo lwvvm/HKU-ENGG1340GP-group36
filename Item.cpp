@@ -4,7 +4,7 @@
 
 using namespace std;
 
-void AutoSweep(
+void performAutoSweep(
     int &totalScore,
     vector<vector<bool>> &revealed,
     const vector<vector<bool>> &mineGrid,

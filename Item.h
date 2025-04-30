@@ -4,7 +4,7 @@
 #include <vector>
 
 // Function declaration
-void AutoSweep(
+void performAutoSweep(
     int &totalScore,                   // Total score (modified)
     std::vector<std::vector<bool> > &revealed, // Revealed grid (modified)
     const std::vector<std::vector<bool> > &mineGrid, // Mine positions (read-only)
