@@ -1,31 +1,35 @@
 #include "invincibility.h"
 
-Invincibility::Invincibility() 
-    : remainingMoves(0), isActive(false) {}
+Invincibility::Invincibility() : remainingReveals(0), activeStatus(false) {}
 
-void Invincibility::activate(int moves) {
-    remainingMoves = moves;
-    isActive = true;
+void Invincibility::activate(int reveals) {
+    remainingReveals = reveals;
+    activeStatus = true;
 }
 
-void Invincibility::useMove() {
-    if (remainingMoves > 0) {
-        remainingMoves--;
-    }
-    if (remainingMoves <= 0) {
+void Invincibility::countReveal() {
+    if (!activeStatus) return;
+    
+    remainingReveals--;
+    if (remainingReveals <= 0) {
         deactivate();
     }
 }
 
-bool Invincibility::isInvincible() const {
-    return isActive && remainingMoves > 0;
+bool Invincibility::isActive() const {
+    return activeStatus && remainingReveals > 0;
 }
 
-int Invincibility::getRemainingMoves() const {
-    return remainingMoves;
+int Invincibility::getRemainingReveals() const {
+    return remainingReveals;
 }
 
 void Invincibility::deactivate() {
-    isActive = false;
-    remainingMoves = 0;
+    activeStatus = false;
+    remainingReveals = 0;
+}
+
+bool Invincibility::Protect() {
+    if (!isActive()) return false;
+    return true;
 }
