@@ -12,6 +12,8 @@
 #include "Item.h"
 #include "quiz_challenge.h"
 #include "guide.h"
+#include "invincibility.h"
+#include "shield.h"
 
 using namespace std;
 
@@ -23,7 +25,7 @@ int totalScore;
 double totalPlayTime;
 int TemporaryInvincibility;
 int AutoSweep;
-int Hint;
+int ShieldCount;
 vector<vector<bool> > mineGrid;
 vector<vector<bool> > revealed;
 vector<vector<bool> > flagged;
@@ -35,7 +37,7 @@ void saveGameState() {
     if (file) {
         file << rows << " " << cols << " " << mines << "\n";
         file << totalScore << "\n";
-        file << TemporaryInvincibility << " " << AutoSweep << " " << Hint << "\n";
+        file << TemporaryInvincibility << " " << AutoSweep << " " << ShieldCount << "\n";
         file << totalPlayTime << "\n";
         for (int r = 0; r < rows; ++r) {
             for (int c = 0; c < cols; ++c) {
@@ -80,7 +82,7 @@ bool loadGameState() {
     }
 
     file >> totalScore;
-    file >> TemporaryInvincibility >> AutoSweep >> Hint;
+    file >> TemporaryInvincibility >> AutoSweep >> ShieldCount;
     file >> totalPlayTime;
     mineGrid.assign(rows, vector<bool>(cols, false));
     revealed.assign(rows, vector<bool>(cols, false));
@@ -133,7 +135,8 @@ private:
     bool gameWon;
     bool gameOver;
 
-
+    Shield shield;
+    Invincibility invincibility; // 添加无敌状态管理对象
     QuizChallenge quizChallenge;
 
     void initializeGrid() {
@@ -182,7 +185,18 @@ private:
         revealed[r][c] = true;
 
         if (mineGrid[r][c]) {
-            gameOver = true;
+            if (shield.Protect()) {
+                cout << "\033[1;34mShield PROTECTED YOU! (" 
+                     << shield.getRemainingTime() << "s remaining)\033[0m\n";
+                shield.deactivate(); // One-time use
+                return;
+            }
+             else if (invincibility.Protect()) {
+                cout << "\033[1;33mInvincibility protected you! ("
+                    << invincibility.getRemainingReveals() << " left)\033[0m\n";
+            } else {
+                gameOver = true;
+            }
             return;
         }
 
@@ -262,6 +276,15 @@ public:
     }
 
     void printBoard(bool showMines = false) const {
+        //invincibility notice
+        if (invincibility.isActive()) {
+            cout << "\033[1;33mTemporary Invincibility: " << invincibility.getRemainingReveals() << " moves remaining.\033[0m\n";
+        }
+        //Shield notice
+        if (shield.isActive()) {
+            cout << "\033[1;34m[Shield: " << shield.getRemainingTime() 
+                << "seconds remaining]\033[0m\n";
+        }
         // Print column numbers
         cout << "   ";
         for (int c = 0; c < cols; ++c) {
@@ -345,7 +368,7 @@ public:
             }
             
             if (cmd[0] == 's') {
-                shop_menu(totalScore, TemporaryInvincibility, AutoSweep, Hint);
+                shop_menu(totalScore, TemporaryInvincibility, AutoSweep, ShieldCount);
                 continue;
             }
 
@@ -354,8 +377,8 @@ public:
                     cout << "\n=== Items Menu ===\n";
                     cout << "1. Use Temporary Invincibility (" << TemporaryInvincibility << " available)\n";
                     cout << "2. Use Auto Sweep (" << AutoSweep << " available)\n";
-                    cout << "3. Use Hint (" << Hint << " available)\n";
-                    cout << "4. Back to Game\n";
+                    cout << "3. Use Shield (" << ShieldCount << " available)\n";
+                    cout << "q. Back to Game\n";
                     cout << "Select an option (1-4): ";
                 
                     string itemInput;
@@ -382,17 +405,13 @@ public:
                     if (itemChoice == 4) {
                         break; // Back to game
                     }
-            
-                    switch (itemChoice) {
+
+                    switch(itemChoice){
                         case 1: // Temporary Invincibility
                             if (TemporaryInvincibility > 0) {
                                 TemporaryInvincibility--;
-                                saveGameState(); // update file
-                                cout << "\033[1;32mTemporary Invincibility activated! You are safe for the next three moves.\033[0m\n";
-                                // TODO: Add functionality for Temporary Invincibility
-                                break;
-                            } else {
-                                cout << "\033[1;31mYou don't have any Temporary Invincibility left!\033[0m\n";
+                                invincibility.activate(3);
+                                cout << "Invincibility activated! 3 moves protected.\n";
                             }
                             break;
 
@@ -401,7 +420,7 @@ public:
                                 AutoSweep--;
                                 saveGameState(); // update file
                                 cout << "\033[1;32mAuto Sweep activated! All adjacent cells are revealed.\033[0m\n";
-                                // TODO: Add functionality for Hint
+                                // TODO: Add functionality for Shield
                                 performAutoSweep(revealed, mineGrid, rows, cols);
                                 break;
                             } else {
@@ -409,16 +428,16 @@ public:
                             }
                             break;
 
-                        case 3: // Hint
-                            if (Hint > 0) {
-                                Hint--;
-                                saveGameState(); // upload file
-                                cout << "\033[1;32mHint activated! Revealing a safe cell.\033[0m\n";
-                                // TODO: Add functionality for Hint
-
-                                break;
-                            } else {
-                                cout << "\033[1;31mYou don't have any Hint left!\033[0m\n";
+                        // In the items menu switch case:
+                        case 3: // Shield
+                            if (ShieldCount > 0) {  // Make sure you've renamed Shield to ShieldCount
+                            ShieldCount--;
+                            shield.activate(30);  // 30 seconds protection
+                            saveGameState();
+                            cout << "\033[1;34mShield activated! You're protected for 30 seconds.\033[0m\n";
+                        // Show remaining time immediately
+                            cout << "\033[1;36m[Shield Timer: " << shield.getRemainingTime() 
+                                << "s remaining]\033[0m\n";
                             }
                             break;    
 
@@ -463,6 +482,14 @@ public:
                     cout << "\033[1;32mCell is flagged. Unflag it first.\033[0m\n";
                     continue;
                 }
+                
+                invincibility.countReveal();
+
+                if (invincibility.isActive()) {
+                    cout << "Protected reveals left: " 
+                        << invincibility.getRemainingReveals() << "\n";
+                }
+
                 revealCell(r, c);
                 if (gameOver) {
                     time_t sessionEndTime = time(nullptr);
@@ -473,7 +500,8 @@ public:
                     printBoard(true);
                     return 1;// Game over, return to difficulty selection
                 }
-            } 
+            }
+
             else if (cmd[0] == 'f') {
                 if (!revealed[r][c]) {
                     flagged[r][c] = !flagged[r][c];
@@ -512,45 +540,50 @@ public:
             }
         }
         return 0;
-    }
+    };
+void showMenu() {
+    while (true) {
+        cout << "\n=== Minesweeper ===\n";
+        cout << "Total Score: " << totalScore << "\n";
+        cout << "1. New Game\n";
+        cout << "2. Continue Last Game\n";
+        cout << "3. Shop Menu\n";
+        cout << "4. Challenge Quiz" << endl;
+        cout << "5. Gameplay Introduction\n"; 
+        cout << "q. Quit\n";
 
-    void showMenu() {
-        while (true) {
-            cout << "\n=== Minesweeper ===\n";
-            cout << "Total Score: " << totalScore << "\n";
-            cout << "1. New Game\n";
-            cout << "2. Continue Last Game\n";
-            cout << "3. Shop Menu\n";
-            cout << "4. Challenge Quiz" << endl;
-            cout << "5. Gameplay Introduction\n"; 
-            cout << "6. Quit\n";
-    
-            cout << "Select your choice (1-6): ";
-            string input;
-            getline(cin, input);
-            
-            if (input.empty()) {
-                cout << "\033[1;32mInvalid input! Please enter a number between 1 and 6.\033[0m\n";
-                continue;
+        cout << "Select your choice (1-5 or q to quit): ";
+        string input;
+        getline(cin, input);
+
+        if (input.empty()) {
+            cout << "\033[1;32mInvalid input! Please enter a number between 1 and 5 or 'q' to quit.\033[0m\n";
+            continue;
+        }
+
+        if (input == "q") {
+            return; // Quit the game
+        }
+
+        bool is_valid = true;
+        for (char c : input) {
+            if (!isdigit(c)) {
+                is_valid = false;
+                break;
             }
+        }
 
-            bool is_valid = true;
-            for (char c : input) {
-                if (!isdigit(c)) {
-                    is_valid = false;
-                    break;
-                }
-            }
-            if (!is_valid) {
-                cout << "\033[1;32mInvalid input! Please enter a number between 1 and 6.\033[0m\n";
-                continue;
-            }
+        if (!is_valid) {
+            cout << "\033[1;32mInvalid input! Please enter a number between 1 and 5 or 'q' to quit.\033[0m\n";
+            continue;
+        }
 
-            int choice = stoi(input);
-            if (choice == 6) {
-                return;// Quit the game
-            } 
-
+        int choice = stoi(input);
+        if (choice < 1 || choice > 5) {
+            cout << "\033[1;32mInvalid input! Please enter a number between 1 and 5 or 'q' to quit.\033[0m\n";
+            continue;
+        }
+         
             else if (choice == 2) {
                 // Continue last game
                 if (hasActiveGame && loadGameState()){
@@ -576,14 +609,14 @@ public:
                     cout << "2. Medium (9x9, 20 mines) - 5 points\n";
                     cout << "3. Hard (12x12, 45 mines) - 8 points\n";
                     cout << "4. Exprt (12x12, 60 mines) - 10 points\n";
-                    cout << "5. Quit\n";  
+                    cout << "q. Quit\n";  
                                 
-                    cout << "Enter difficulty level (1-5): ";
+                    cout << "Enter difficulty level (1-4): ";
                     string levelInput;
                     getline(cin, levelInput);
 
                     if (levelInput.empty()) {
-                        cout << "\033[1;32mInvalid input! Please enter a number between 1 and 5.\033[0m\n";
+                        cout << "\033[1;32mInvalid input! Please enter a number between 1 and 4.\033[0m\n";
                         continue;
                     }
 
@@ -596,12 +629,12 @@ public:
                     }
 
                     if (!level_valid) {
-                        cout << "\033[1;32mInvalid input! Please enter a number between 1 and 5.\033[0m\n";
+                        cout << "\033[1;32mInvalid input! Please enter a number between 1 and 4.\033[0m\n";
                         continue;
                     }
 
                     int level = stoi(levelInput);
-                    if (level == 5) {
+                    if (level == 'q') {
                         break; // Quit the game
                     } 
 
@@ -614,21 +647,21 @@ public:
                         }
                         break;
                     } else {
-                        cout << "\033[1;32mInvalid choice! Please enter a number between 1 and 5.\033[0m\n";
+                        cout << "\033[1;32mInvalid choice! Please enter a number between 1 and 4.\033[0m\n";
                     }
                 }   
             } 
 
             else if (choice == 3) {
                 // Open shop menu
-                shop_menu(totalScore, TemporaryInvincibility, AutoSweep, Hint);
+                shop_menu(totalScore, TemporaryInvincibility, AutoSweep, ShieldCount);
                 continue;
             }
 
             else if (choice == 4) {
                 quizChallenge.showQuizChallengeMenu(totalScore);
             }
-            else if (choice == 5) {
+            else if (choice == 'q') {
                 // Gameplay Introduction
                 guide();
             }
