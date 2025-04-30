@@ -5,20 +5,14 @@
 using namespace std;
 
 void performAutoSweep(
-    int &totalScore,
     vector<vector<bool>> &revealed,
     const vector<vector<bool>> &mineGrid,
     int rows,
     int cols
 ) {
-    if (totalScore < 1) { // Check if the user has at least 1 point
-        cout << "\033[1;31mNot enough total points to use the Mine Revealer! You need at least 1 point.\033[0m\n";
-        return;
-    }
-
     int r = -1, c = -1;
     while (true) {
-        cout << "Enter the center of the 3x3 area (e.g., '3 5'): ";
+        cout << "Enter the center of the 3x3 area (e.g., '2 3'): ";
         string coordInput;
         getline(cin, coordInput);
 
@@ -42,9 +36,6 @@ void performAutoSweep(
         break;
     }
 
-    // Deduct 1 point from total score
-    totalScore--;
-
     // Reveal mines in the 3x3 range
     for (int dr = -1; dr <= 1; ++dr) {
         for (int dc = -1; dc <= 1; ++dc) {
@@ -56,5 +47,5 @@ void performAutoSweep(
         }
     }
 
-    cout << "\033[1;33mMines in the 3x3 area have been revealed! 1 point deducted from your total score.\033[0m\n";
+    cout << "\033[1;33mMines in the 3x3 area have been revealed!\033[0m\n";
 }
