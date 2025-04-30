@@ -3,6 +3,6 @@
 
 void saveGameState();
 bool loadGameState();
-void shop_menu(int& totalScore, int& TemporaryInvincibility, int& AutoSweep, int& Hint);
+void shop_menu(int& totalScore, int& TemporaryInvincibility, int& AutoSweep, int& shield);
 
 #endif
