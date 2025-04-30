@@ -249,7 +249,7 @@ public:
 
     void printBoard(bool showMines = false) const {
         // Print column numbers
-        cout << "    ";
+        cout << "   ";
         for (int c = 0; c < cols; ++c) {
             cout << setw(3) << c << " ";
         }
@@ -388,10 +388,10 @@ public:
                                 saveItems(TemporaryInvincibility, AutoSweep, Hint); // update file
                                 cout << "\033[1;32mAuto Sweep activated! All adjacent cells are revealed.\033[0m\n";
                                 // TODO: Add functionality for Hint
-                                performAutoSweep(totalScore, revealed, mineGrid, rows, cols);
+                                performAutoSweep(revealed, mineGrid, rows, cols);
                                 break;
                             } else {
-                                cout << "\033[1;31mYou don't have any Hint left!\033[0m\n";
+                                cout << "\033[1;31mYou don't have any AutoSweep left!\033[0m\n";
                             }
                             break;
 
