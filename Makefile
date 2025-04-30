@@ -3,7 +3,7 @@ CXXFLAGS = -std=c++11
 TARGET = game
 
 # Source files
-SRCS = Item.cpp guide.cpp main.cpp quiz_challenge.cpp shop_menu.cpp invincibility.cpp
+SRCS = Item.cpp guide.cpp main.cpp quiz_challenge.cpp shop_menu.cpp invincibility.cpp shield.cpp
 
 # Object files (replace .cpp with .o)
 OBJS = $(SRCS:.cpp=.o)
