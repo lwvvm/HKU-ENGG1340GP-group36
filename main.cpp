@@ -28,6 +28,8 @@ vector<vector<bool> > mineGrid;
 vector<vector<bool> > revealed;
 vector<vector<bool> > flagged;
 
+bool hasActiveGame = false;
+
 void saveGameState() {
     std::ofstream file("saved_game_state.txt");
     if (file) {
@@ -59,59 +61,72 @@ void saveGameState() {
 
 bool loadGameState() {
     std::ifstream file("saved_game_state.txt");
-    if (file) {
-        file >> rows >> cols >> mines;
-        file >> totalScore;
-        file >> totalPlayTime;
-        file >> TemporaryInvincibility >> AutoSweep >> Hint;
-        mineGrid.assign(rows, vector<bool>(cols, false));
-        revealed.assign(rows, vector<bool>(cols, false));
-        flagged.assign(rows, vector<bool>(cols, false));
-
-        for (int r = 0; r < rows; ++r) {
-            for (int c = 0; c < cols; ++c) {
-                int val;
-                if (file >> val) {
-                    mineGrid[r][c] = val;
-                }
-                else {
-                    cout << "\033[1;31mError: Failed to load mineGrid.\033[0m\n";
-                    return false;
-                }
-            }
-        }
-        for (int r = 0; r < rows; ++r) {
-            for (int c = 0; c < cols; ++c) {
-                int val;
-                if (file >> val) {
-                    revealed[r][c] = val;
-                }
-                else {
-                    cout << "\033[1;31mError: Failed to load mineGrid.\033[0m\n";
-                    return false;
-                }
-            }
-        }
-        for (int r = 0; r < rows; ++r) {
-            for (int c = 0; c < cols; ++c) {
-                int val;
-                if (file >> val) {
-                    flagged[r][c] = val;
-                }
-                else {
-                    cout << "\033[1;31mError: Failed to load mineGrid.\033[0m\n";
-                    return false;
-                }
-            }
-        }
-        file.close();
-        return true;
-
-    } else {
-        cout << "\033[1;31mError: Unable to load game state.\033[0m\n";
+    if (!file) {
+        std::cout << "\033[1;31mError: No saved game found.\033[0m\n";
+        hasActiveGame = false; // No valid game state
         return false;
     }
+
+    if (!(file >> rows >> cols >> mines)) {
+        std::cout << "\033[1;31mError: Invalid saved game data.\033[0m\n";
+        hasActiveGame = false; // No valid game state
+        return false;
+    }
+
+    if (rows == 0 || cols == 0 || mines == 0) {
+        std::cout << "\033[1;31mError: No valid game state found.\033[0m\n";
+        hasActiveGame = false;
+        return false;
+    }
+
+    file >> totalScore;
+    file >> TemporaryInvincibility >> AutoSweep >> Hint;
+    file >> totalPlayTime;
+    mineGrid.assign(rows, vector<bool>(cols, false));
+    revealed.assign(rows, vector<bool>(cols, false));
+    flagged.assign(rows, vector<bool>(cols, false));
+
+    for (int r = 0; r < rows; ++r) {
+        for (int c = 0; c < cols; ++c) {
+            int val;
+            if (file >> val) {
+                mineGrid[r][c] = val;
+            }
+            else {
+                cout << "\033[1;31mError: Failed to load mineGrid.\033[0m\n";
+                return false;
+            }
+        }
+    }
+    for (int r = 0; r < rows; ++r) {
+        for (int c = 0; c < cols; ++c) {
+            int val;
+            if (file >> val) {
+                revealed[r][c] = val;
+            }
+            else {
+                cout << "\033[1;31mError: Failed to load mineGrid.\033[0m\n";
+                return false;
+            }
+        }
+    }
+    for (int r = 0; r < rows; ++r) {
+        for (int c = 0; c < cols; ++c) {
+            int val;
+            if (file >> val) {
+                flagged[r][c] = val;
+            }
+            else {
+                cout << "\033[1;31mError: Failed to load mineGrid.\033[0m\n";
+                return false;
+            }
+        }
+    }
+    file.close();
+    hasActiveGame = true;
+    return true;
 }
+
 
 class Minesweeper {
 private:
@@ -204,8 +219,9 @@ private:
 public:
     Minesweeper() : gameOver(false), gameWon(false) {
         srand(time(0));
-        initializeGrid();
-        loadGameState();
+        if (!loadGameState()) { 
+            initializeGrid();
+        }
     }
 
     ~Minesweeper() {
@@ -450,7 +466,7 @@ public:
                 revealCell(r, c);
                 if (gameOver) {
                     time_t sessionEndTime = time(nullptr);
-                    totalPlayTime += difftime(sessionEndTime, sessionStartTime); // 累加本次游戏时长
+                    totalPlayTime += difftime(sessionEndTime, sessionStartTime); // game time
 
                     cout << "\033[1;31mGame Over! You hit a mine.\033[0m\n";
                     cout << "\033[1;31mTime spent: " << totalPlayTime << " seconds.\033[0m\n";
@@ -537,7 +553,7 @@ public:
 
             else if (choice == 2) {
                 // Continue last game
-                if (loadGameState()){
+                if (hasActiveGame && loadGameState()){
                     if (gameOver){
                         cout << "\033[1;31mYou cannot continue this game. You already lost! Please start a new game.\033[0m\n";
                     } else if (gameWon) {
