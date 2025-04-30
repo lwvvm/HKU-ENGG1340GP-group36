@@ -4,31 +4,6 @@
 #include "shop_menu.h"
 using namespace std;
 
-void saveItems(int TemporaryInvincibility, int AutoSweep, int Hint) {
-    std::ofstream file("items_storage.txt");
-    if (file) {
-        file << TemporaryInvincibility << "\n";
-        file << AutoSweep << "\n";
-        file << Hint << "\n";
-        file.close();
-    } else {
-        cout << "Error: Unable to save items to file.\n";
-    }
-}
-
-void loadItems(int& TemporaryInvincibility, int& AutoSweep, int& Hint) {
-    std::ifstream file("items_storage.txt");
-    if (file) {
-        file >> TemporaryInvincibility;
-        file >> AutoSweep;
-        file >> Hint;
-        file.close();
-    } else {
-        TemporaryInvincibility = 0;
-        AutoSweep = 0;
-        Hint = 0;
-    }
-}
 
 bool isValidNumber(const string& input) {
     for (char c : input) {
@@ -68,7 +43,7 @@ void shop_menu(int& totalScore, int& TemporaryInvincibility, int& AutoSweep, int
         }
         
         if (choice == 3) {
-            saveItems(TemporaryInvincibility, AutoSweep, Hint);
+            saveGameState();
             break;
         } else if (choice < 1 || choice > 3) {
             std::cout << "\033[1;32mInvalid choice! Please enter a number between 1 and 3.\033[0m\n";
@@ -121,7 +96,7 @@ void shop_menu(int& totalScore, int& TemporaryInvincibility, int& AutoSweep, int
                     if (totalScore >= cost) {
                         totalScore -= cost;
                         cout << "\033[1;32mPurchase successful! You bought option " << buyChoice << ".\033[0m\n";
-                        saveItems(TemporaryInvincibility, AutoSweep, Hint);
+                        saveGameState();
                     } else {
                         cout << "\033[1;32mNot enough points! You need at least " << cost << " points.\033[0m\n";
                         // Revert the increment if purchase fails
@@ -132,6 +107,7 @@ void shop_menu(int& totalScore, int& TemporaryInvincibility, int& AutoSweep, int
                         }
                     } 
                 }
+                saveGameState(); // Save game state after purchases
                 break;
             }
             case 2: { // Items Storage
