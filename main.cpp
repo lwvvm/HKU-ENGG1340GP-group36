@@ -608,7 +608,7 @@ void showMenu() {
                     cout << "1. Easy (9x9, 10 mines) - 3 points\n";
                     cout << "2. Medium (9x9, 20 mines) - 5 points\n";
                     cout << "3. Hard (12x12, 45 mines) - 8 points\n";
-                    cout << "4. Exprt (12x12, 60 mines) - 10 points\n";
+                    cout << "4. Expert (12x12, 60 mines) - 10 points\n";
                     cout << "q. Quit\n";  
                                 
                     cout << "Enter difficulty level (1-4): ";
@@ -619,7 +619,9 @@ void showMenu() {
                         cout << "\033[1;32mInvalid input! Please enter a number between 1 and 4.\033[0m\n";
                         continue;
                     }
-
+                    if (levelInput == "q") {
+                        break; // Quit the game
+                    }
                     bool level_valid = true;
                     for (char c : levelInput) {
                         if (!isdigit(c)) {
@@ -634,11 +636,7 @@ void showMenu() {
                     }
 
                     int level = stoi(levelInput);
-                    if (level == 'q') {
-                        break; // Quit the game
-                    } 
-
-                    else if (level >= 1 && level <= 4) {
+                    if (level >= 1 && level <= 4) {
                         setDifficulty(level);
                         int result = play();
                         saveGameState();
