@@ -12,7 +12,7 @@
 #include "Item.h"
 #include "quiz_challenge.h"
 #include "guide.h"
-
+#include "invincibility.h"
 using namespace std;
 
 int rows;
@@ -174,26 +174,46 @@ private:
         return count;
     }
 
-    void revealCell(int r, int c) {
+    Invincibility invincibility;
+    
+    void revealCell(int r, int c,bool isPlayerMove) {
         if (!isValid(r, c) || revealed[r][c] || flagged[r][c]) {
             return;
         }
 
         revealed[r][c] = true;
-
-        if (mineGrid[r][c]) {
-            gameOver = true;
-            return;
-        }
-
+        
+    // Auto-expand if empty cell
         if (countAdjacentMines(r, c) == 0) {
             for (int dr = -1; dr <= 1; ++dr) {
                 for (int dc = -1; dc <= 1; ++dc) {
-                    revealCell(r + dr, c + dc);
+                    if (dr != 0 || dc != 0) { // Skip current cell
+                        revealCell(r + dr, c + dc, false); // false = auto-expand
+                    }
                 }
             }
         }
     }
+    // void revealCell(int r, int c) {
+    //     if (!isValid(r, c) || revealed[r][c] || flagged[r][c]) {
+    //         return;
+    //     }
+
+    //     revealed[r][c] = true;
+
+    //     if (mineGrid[r][c]) {
+    //         gameOver = true;
+    //         return;
+    //     }
+
+    //     if (countAdjacentMines(r, c) == 0) {
+    //         for (int dr = -1; dr <= 1; ++dr) {
+    //             for (int dc = -1; dc <= 1; ++dc) {
+    //                 revealCell(r + dr, c + dc);
+    //             }
+    //         }
+    //     }
+    // }
 
     bool checkWin() const {
         for (int r = 0; r < rows; ++r) {
@@ -463,17 +483,39 @@ public:
                     cout << "\033[1;32mCell is flagged. Unflag it first.\033[0m\n";
                     continue;
                 }
-                revealCell(r, c);
-                if (gameOver) {
-                    time_t sessionEndTime = time(nullptr);
-                    totalPlayTime += difftime(sessionEndTime, sessionStartTime); // game time
 
-                    cout << "\033[1;31mGame Over! You hit a mine.\033[0m\n";
-                    cout << "\033[1;31mTime spent: " << totalPlayTime << " seconds.\033[0m\n";
-                    printBoard(true);
-                    return 1;// Game over, return to difficulty selection
+                
+                // Track if we're using invincibility
+                bool usedInvincibility = false;
+                if (invincibility.isInvincible()) {
+                    invincibility.useMove();
+                    usedInvincibility = true;
+                    cout << "\033[1;36mInvincibility active (" 
+                        << invincibility.getRemainingMoves() 
+                        << " moves remain)\033[0m\n";
                 }
-            } 
+
+                // Pass true for player moves (false would be for auto-expansion)
+                revealCell(r, c, true);
+
+                // Mine hit detection (after reveal)
+                if (mineGrid[r][c]) {
+                    if (!usedInvincibility) {
+                        time_t sessionEndTime = time(nullptr);
+                        totalPlayTime += difftime(sessionEndTime, sessionStartTime);
+
+                        cout << "\033[1;31mGame Over! You hit a mine.\033[0m\n";
+                        cout << "\033[1;31mTime spent: " << totalPlayTime << " seconds.\033[0m\n";
+                        printBoard(true);
+                        return 1;
+                }
+                else {
+                    cout << "\033[1;35mInvincibility saved you! Hit mine at (" 
+                        << r << "," << c << ")\033[0m\n";
+                }
+            }
+        }
+                
             else if (cmd[0] == 'f') {
                 if (!revealed[r][c]) {
                     flagged[r][c] = !flagged[r][c];
