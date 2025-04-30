@@ -3,26 +3,18 @@
 
 class Invincibility {
 private:
-    int remainingMoves;  // Number of remaining protected moves
-    bool isActive;       // Whether invincibility is currently active
-
+    int remainingReveals;
+    bool activeStatus;
+    
 public:
     Invincibility();
     
-    // Activate invincibility with specified number of moves
-    void activate(int moves);
-    
-    // Use one invincibility move
-    void useMove();
-    
-    // Check if invincibility is currently active
-    bool isInvincible() const;
-    
-    // Get remaining protected moves
-    int getRemainingMoves() const;
-    
-    // Deactivate invincibility
+    void activate(int reveals);
+    void countReveal();
+    bool isActive() const;
+    int getRemainingReveals() const;
     void deactivate();
+    bool Protect();  
 };
 
 #endif
