@@ -17,6 +17,6 @@
 ### non-standard libraries:
 
 ### compliation/execution instrstruction:
--Download the zip, and throw it to your local device and type: 
-make
-./game 
+- Download the zip, and throw it to your local device and type: 
+  - make
+  - ./game 
