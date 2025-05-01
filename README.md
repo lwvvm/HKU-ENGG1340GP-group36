@@ -1,19 +1,12 @@
 # Minesweeper
 ## ENGG1340 Gourp Porjrct ---- Group36
-
-team members:
-
-Liang Weibo
-
-Lin Yet Fei Angel
-
-Lin Zhongxi
-
-Lo Ka Lai
-
-Tso Kok Ching
-
-Wu Jun Hao
+### Team members:
+- Liang Weibo
+- Lin Yet Fei Angel
+- Lin Zhongxi
+- Lo Ka Lai
+- Tso Kok Ching
+- Wu Jun Hao
 
 
 application description:
