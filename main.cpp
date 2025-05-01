@@ -136,7 +136,7 @@ private:
     bool gameOver;
 
     Shield shield;
-    Invincibility invincibility; // 添加无敌状态管理对象
+    Invincibility invincibility;
     QuizChallenge quizChallenge;
 
     void initializeGrid() {
@@ -186,14 +186,12 @@ private:
 
         if (mineGrid[r][c]) {
             if (shield.Protect()) {
-                cout << "\033[1;34mShield PROTECTED YOU! (" 
-                     << shield.getRemainingTime() << "s remaining)\033[0m\n";
+                cout << "\033[1;34mShield protected you!\033[0m\n";
                 shield.deactivate(); // One-time use
                 return;
             }
              else if (invincibility.Protect()) {
-                cout << "\033[1;33mInvincibility protected you! ("
-                    << invincibility.getRemainingReveals() << " left)\033[0m\n";
+                cout << "\033[1;33mInvincibility protected you!\033[0m\n";
             } else {
                 gameOver = true;
             }
@@ -278,7 +276,7 @@ public:
     void printBoard(bool showMines = false) const {
         //invincibility notice
         if (invincibility.isActive()) {
-            cout << "\033[1;33mTemporary Invincibility: " << invincibility.getRemainingReveals() << " moves remaining.\033[0m\n";
+            cout << "\033[1;33mInvincibility: " << invincibility.getRemainingReveals() << " moves remaining.\033[0m\n";
         }
         //Shield notice
         if (shield.isActive()) {
@@ -378,7 +376,7 @@ public:
                     cout << "1. Use Temporary Invincibility (" << TemporaryInvincibility << " available)\n";
                     cout << "2. Use Auto Sweep (" << AutoSweep << " available)\n";
                     cout << "3. Use Shield (" << ShieldCount << " available)\n";
-                    cout << "q. Back to Game\n";
+                    cout << "4. Back to Game\n";
                     cout << "Select an option (1-4): ";
                 
                     string itemInput;
@@ -397,7 +395,7 @@ public:
                         }
                     }
                     if (!is_valid) {
-                        cout << "\033[1;32mInvalid input! Please enter a number between 1 and 6.\033[0m\n";
+                        cout << "\033[1;32mInvalid input! Please enter a number between 1 and 4.\033[0m\n";
                         continue;
                     } 
 
@@ -410,8 +408,10 @@ public:
                         case 1: // Temporary Invincibility
                             if (TemporaryInvincibility > 0) {
                                 TemporaryInvincibility--;
+                                saveGameState();
                                 invincibility.activate(3);
-                                cout << "Invincibility activated! 3 moves protected.\n";
+                            } else {
+                                cout << "\033[1;31mYou don't have any Invincibility left!\033[0m\n";
                             }
                             break;
 
@@ -420,7 +420,6 @@ public:
                                 AutoSweep--;
                                 saveGameState(); // update file
                                 cout << "\033[1;32mAuto Sweep activated! All adjacent cells are revealed.\033[0m\n";
-                                // TODO: Add functionality for Shield
                                 performAutoSweep(revealed, mineGrid, rows, cols);
                                 break;
                             } else {
@@ -428,16 +427,13 @@ public:
                             }
                             break;
 
-                        // In the items menu switch case:
                         case 3: // Shield
-                            if (ShieldCount > 0) {  // Make sure you've renamed Shield to ShieldCount
+                            if (ShieldCount > 0) {  
                             ShieldCount--;
                             shield.activate(30);  // 30 seconds protection
                             saveGameState();
-                            cout << "\033[1;34mShield activated! You're protected for 30 seconds.\033[0m\n";
-                        // Show remaining time immediately
-                            cout << "\033[1;36m[Shield Timer: " << shield.getRemainingTime() 
-                                << "s remaining]\033[0m\n";
+                            } else {
+                                cout << "\033[1;31mYou don't have any Invincibility left!\033[0m\n";
                             }
                             break;    
 
@@ -481,13 +477,6 @@ public:
                 if (flagged[r][c]) {
                     cout << "\033[1;32mCell is flagged. Unflag it first.\033[0m\n";
                     continue;
-                }
-                
-                invincibility.countReveal();
-
-                if (invincibility.isActive()) {
-                    cout << "Protected reveals left: " 
-                        << invincibility.getRemainingReveals() << "\n";
                 }
 
                 revealCell(r, c);
@@ -535,6 +524,9 @@ public:
     
                 totalScore += score;
                 cout << "\033[1;31mYou earned " << score << " points!\033[0m\n";
+
+                gameWon = true; 
+                
                 printBoard(true);
                 return 1; // Game won, return to difficulty selection
             }
