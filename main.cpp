@@ -243,7 +243,7 @@ public:
 
     void setDifficulty(int level) {
         totalPlayTime = 0; // Reset play time for new game
-        gameItme.deactivate(); // Reset invincibility for new game
+        gameItem.deactivateInvincibility(); // Reset invincibility for new game
         switch (level) {
             case 1: // Easy
                 rows = 9;
