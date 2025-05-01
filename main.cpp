@@ -243,7 +243,7 @@ public:
 
     void setDifficulty(int level) {
         totalPlayTime = 0; // Reset play time for new game
-        invincibility.deactivate(); // Reset invincibility for new game
+        gameItme.deactivate(); // Reset invincibility for new game
         switch (level) {
             case 1: // Easy
                 rows = 9;
@@ -414,7 +414,6 @@ public:
                             TemporaryInvincibility--;
                             saveGameState();
                             gameItem.activateInvincibility(3);
-                            cout << "Invincibility activated! "<< invincibility.getRemainingReveals()<< "moves protected.\n";
                         } else {
                                 cout << "\033[1;31mYou don't have any Invincibility left!\033[0m\n";
                             }
