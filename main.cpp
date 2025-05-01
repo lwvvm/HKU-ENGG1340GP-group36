@@ -7,13 +7,13 @@
 #include <limits>
 #include <fstream>
 #include <sstream>
+#include <unistd.h>
 
 #include "shop_menu.h"
 #include "Item.h"
 #include "quiz_challenge.h"
 #include "guide.h"
 #include "cover_display.h"
-
 
 using namespace std;
 
@@ -227,7 +227,14 @@ private:
         }
         cout << "\n";
     }
-  
+    
+    void clearScreen() const {
+        #ifdef _WIN32
+                system("cls");
+        #else
+                system("clear");
+        #endif
+            }
 
 
 public:
@@ -339,6 +346,7 @@ public:
         time_t sessionStartTime = time(nullptr);
 
         while (!gameOver && !gameWon) {
+            clearScreen();
             printBoard();
             cout << "Total Score: " << totalScore << "\n";
             cout << "Current game score: " << score << "\n";
@@ -487,12 +495,14 @@ public:
                 
                 revealCell(r, c);
                 if (gameOver) {
+                    clearScreen();
                     time_t sessionEndTime = time(nullptr);
                     totalPlayTime += difftime(sessionEndTime, sessionStartTime); // game time
-
+                    
+                    printBoard(true);
                     cout << "\033[1;31mGame Over! You hit a mine.\033[0m\n";
                     cout << "\033[1;31mTime spent: " << totalPlayTime << " seconds.\033[0m\n";
-                    printBoard(true);
+                    
                     return 1;// Game over, return to difficulty selection
                 }
             }
