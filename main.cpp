@@ -479,6 +479,8 @@ public:
                     continue;
                 }
 
+                invincibility.countReveal();
+                
                 revealCell(r, c);
                 if (gameOver) {
                     time_t sessionEndTime = time(nullptr);
