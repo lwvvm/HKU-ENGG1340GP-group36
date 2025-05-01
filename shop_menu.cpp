@@ -15,7 +15,6 @@ bool isValidNumber(const string& input) {
 }
 
 void shop_menu(int& totalScore, int& TemporaryInvincibility, int& AutoSweep, int& Shield) {
-    totalScore= 10000;
     int choice = 0;
     while (true) {
         cout << "\n=== Shop Menu ===\n";

@@ -272,6 +272,7 @@ public:
                 break;
         }
         initializeGrid();
+        hasActiveGame = true; // Set to true when a new game is started
     }
 
     void printBoard(bool showMines = false) const {
@@ -654,7 +655,7 @@ void showMenu() {
             else if (choice == 4) {
                 quizChallenge.showQuizChallengeMenu(totalScore);
             }
-            else if (choice == 'q') {
+            else if (choice == 5) {
                 // Gameplay Introduction
                 guide();
             }
