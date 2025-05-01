@@ -15,6 +15,10 @@
 - There are different grade of difficulties for players to choose, making the game suitable for different playeres. The mines are generated randomly in each map, increasing the randomness and enjoyment of this game. PLayers can buy items in the game to help themselves which involves dynamic memory management, making the game unique and innovative. Besides, the little quiz in the game can help student review what they have learned in this lesson, so the game is good for students' study too.
 
 ### non-standard libraries:
+- shop_menu.h
+- Item.h
+- quiz_challenge.h
+- guide.h
 
 ### compliation/execution instrstruction:
 - Download the zip, and throw it to your local device and type: 
