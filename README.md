@@ -1,4 +1,4 @@
-# MinesHack
+# MineHack
 ## ENGG1340 Gourp Porjrct ---- Group36
 ### Team members:
 - Liang Weibo
