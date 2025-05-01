@@ -12,6 +12,7 @@
 #include "Item.h"
 #include "quiz_challenge.h"
 #include "guide.h"
+#include "cover_display.h"
 
 
 using namespace std;
@@ -668,6 +669,10 @@ void showMenu() {
 };
 
 int main() {
+    CoverDisplay cover;
+    cover.showAnimatedCover();
+
+    std::cin.ignore();
     Minesweeper game;
     game.showMenu();
     
