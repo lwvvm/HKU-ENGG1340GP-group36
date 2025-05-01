@@ -8,13 +8,7 @@ void Shield::activate(int seconds) {
     activeStatus = true;
     activationTime = time(nullptr);
     durationSeconds = seconds;
-    std::cout << "\033[1;34mShield activated! You're protected for " 
-              << durationSeconds << " seconds.\033[0m\n";
-// }
-    // Add debug output here:
-    std::cout << "Shield status: " << (activeStatus ? "Active" : "Inactive") 
-              << ", Remaining: " << getRemainingTime() << "s\n";}
-
+}
 void Shield::deactivate() {
     activeStatus = false;
     std::cout << "\033[1;34mShield has expired.\033[0m\n";
