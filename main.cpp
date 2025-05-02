@@ -681,8 +681,11 @@ void showMenu() {
 int main() {
     CoverDisplay cover;
     cover.showAnimatedCover();
-
-    std::cin.ignore();
+    
+    // wait for enter
+    std::cin.get();
+    return 0;
+    
     Minesweeper game;
     game.showMenu();
     
