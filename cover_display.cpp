@@ -1,7 +1,4 @@
 #include "cover_display.h"
-#include <windows.h> 
-#include <chrono>
-#include <thread>
 
 CoverDisplay::CoverDisplay() : 
     mineAscii{
@@ -23,23 +20,13 @@ CoverDisplay::CoverDisplay() :
 {}
 
 void CoverDisplay::clearScreen() {
-    #ifdef _WIN32
-        system("cls");
-    #else
-        system("clear");
-    #endif
+    // ANSI clear screen
+    std::cout << "\033[2J\033[1;1H";
 }
 
 void CoverDisplay::printWithColor(const std::string& text, int colorCode) {
-    #ifdef _WIN32
-        HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-        SetConsoleTextAttribute(hConsole, colorCode);
-        std::cout << text;
-        SetConsoleTextAttribute(hConsole, 7); // restore the default color
-    #else
-        // ANSI color code
-        std::cout << "\033[" << colorCode << "m" << text << "\033[0m";
-    #endif
+    // ANSI color code
+    std::cout << "\033[" << colorCode << "m" << text << "\033[0m";
 }
 
 void CoverDisplay::animateText(const std::string& text, int delayMs) {
@@ -52,7 +39,7 @@ void CoverDisplay::animateText(const std::string& text, int delayMs) {
 
 void CoverDisplay::printAsciiArt() {
     for (const auto& line : mineAscii) {
-        printWithColor(line, 10); // green
+        printWithColor(line, 32); // green
         std::cout << std::endl;
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
@@ -60,7 +47,7 @@ void CoverDisplay::printAsciiArt() {
 
 void CoverDisplay::print3DText(const std::string& text) {
     for (const auto& line : hackAscii) {
-        printWithColor(line, 12); // red 
+        printWithColor(line, 31); // red
         std::cout << std::endl;
         std::this_thread::sleep_for(std::chrono::milliseconds(80));
     }
@@ -69,15 +56,14 @@ void CoverDisplay::print3DText(const std::string& text) {
 void CoverDisplay::showAnimatedCover() {
     clearScreen();
     
-    // part1: gradually show characters
+    // part1: slowly show characters
     printAsciiArt();
     std::this_thread::sleep_for(std::chrono::seconds(1));
     
-    
-    // part2: 3-dimentional characters
+    // part2: 3-dimensional characters
     print3DText("MineHack");
     
-    // part3: animation subtitle
+    // part3: animation
     std::this_thread::sleep_for(std::chrono::seconds(1));
     animateText("> The Ultimate Minesweeper Adventure <", 50);
     
