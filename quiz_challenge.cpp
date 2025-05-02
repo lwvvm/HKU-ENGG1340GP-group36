@@ -254,7 +254,7 @@ bool QuizChallenge::runQuiz(int& mainGameScore) {
 
         std::cout << "=== Quiz Challenge ===\n";
         std::cout << "Rules:\n";
-        std::cout << "- Correct answer: +2 points\n";
+        std::cout << "- Correct answer: +1 points\n";
         std::cout << "- Wrong answer: 0 points\n";
         std::cout << "- Type 'q' to quit\n\n";
         std::cout << "Score Earned by Quiz: " << getQuizScore() << "\n";
