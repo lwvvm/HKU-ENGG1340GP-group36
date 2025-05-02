@@ -684,7 +684,6 @@ int main() {
     
     // wait for enter
     std::cin.get();
-    return 0;
     
     Minesweeper game;
     game.showMenu();
