@@ -525,7 +525,7 @@ public:
 
                 // Check for difficulty-specific bonuses
                 if (rows == 9 && cols == 9 && mines == 10 && totalPlayTime < 300) {
-                    score += 4; // Easy 
+                    score += 3; // Easy 
                     cout << "\033[1;33mBonus! You completed the game in less than 300 seconds. Your score is doubled!\033[0m\n";
                 } else if (rows == 9 && cols == 9 && mines == 20 && totalPlayTime < 600) {
                     score += 5; // Medium
