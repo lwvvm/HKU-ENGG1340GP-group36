@@ -132,6 +132,7 @@ class Minesweeper {
 private:
     bool gameWon;
     bool gameOver;
+    mutable std::string protectionMessage;
 
     Item gameItem;
     QuizChallenge quizChallenge;
@@ -175,6 +176,7 @@ private:
     }
 
     void revealCell(int r, int c) {
+        protectionMessage.clear();
         if (!isValid(r, c) || revealed[r][c] || flagged[r][c]) {
             return;
         }
@@ -184,10 +186,10 @@ private:
         if (mineGrid[r][c]) {
             if (gameItem.isProtected()) {
                 if (gameItem.isShieldActive()) {
-                    cout << "\033[1;34mShield protected you!\033[0m\n";
+                    protectionMessage = "\033[1;34mShield protected you!\033[0m\n";
                     gameItem.deactivateShield();
                 } else if (gameItem.isInvincible()) {
-                    cout << "\033[1;33mInvincibility protected you!\033[0m\n";
+                    protectionMessage = "\033[1;33mInvincibility protected you!\033[0m\n";
                 }
                 return;
             } 
@@ -282,6 +284,7 @@ public:
     }
 
     void printBoard(bool showMines = false) const {
+        clearScreen();
         //invincibility notice
         if (gameItem.isInvincible()) {
             cout << "\033[1;33mInvincibility: " << gameItem.getRemainingInvincibilityReveals() 
@@ -336,6 +339,10 @@ public:
             }
             cout << "\n";
             printHorizontalLine();
+        }
+
+        if (!protectionMessage.empty()) {
+            cout << protectionMessage << endl;
         }
     }
 
