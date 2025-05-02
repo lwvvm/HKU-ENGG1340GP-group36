@@ -38,6 +38,7 @@
 - Item.h
 - quiz_challenge.h
 - guide.h
+- cover_display.h
 
 ### compliation/execution instrstruction:
 - Download the zip, and throw it to your local device and type: 
