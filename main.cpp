@@ -188,7 +188,6 @@ private:
                     gameItem.deactivateShield();
                 } else if (gameItem.isInvincible()) {
                     cout << "\033[1;33mInvincibility protected you!\033[0m\n";
-                    gameItem.countInvincibilityReveal();
                 }
                 return;
             } 
