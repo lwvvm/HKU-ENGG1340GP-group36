@@ -64,20 +64,18 @@ void saveGameState() {
 bool loadGameState() {
     std::ifstream file("saved_game_state.txt");
     if (!file) {
-        std::cout << "\033[1;31mError: No saved game found.\033[0m\n";
         hasActiveGame = false; // No valid game state
         return false;
     }
 
-    if (!(file >> rows >> cols >> mines)) {
+    else if (rows == 0 || cols == 0 || mines == 0) {
+        hasActiveGame = false;
+        return false;
+    }
+
+    else if (!(file >> rows >> cols >> mines)) {
         std::cout << "\033[1;31mError: Invalid saved game data.\033[0m\n";
         hasActiveGame = false; // No valid game state
-        return false;
-    }
-
-    if (rows == 0 || cols == 0 || mines == 0) {
-        std::cout << "\033[1;31mError: No valid game state found.\033[0m\n";
-        hasActiveGame = false;
         return false;
     }
 
