@@ -22,7 +22,16 @@
   - 'i': Players use items to help themselves to comlpete the game
 
 ### features:
-- There are different grade of difficulties for players to choose, making the game suitable for different playeres. The mines are generated randomly in each map, increasing the randomness and enjoyment of this game. PLayers can buy items in the game to help themselves which involves dynamic memory management, making the game unique and innovative. Besides, the little quiz in the game can help student review what they have learned in this lesson, so the game is good for students' study too.
+- After players choose the level of the difficulty of the game, mines will be generated randomly in the map. (Generation of random events)
+- After every step taken by players, the game need to store the state of the game. (Data structures for storing data)
+- After mines be generated randomly, the game store the place of those mines in order to run the game. (Data structures for storing data)
+- After players buy items in the shop, the game store the number of the items that the player has. (Data structures for storing data)
+- Players take steps and buy items in the shop change the state of the game. (Dynamic memory management)
+- Players' points change after winning the game and answer the quiz. (Dynamic memory management)
+- The program include main.cpp, cover_display.cpp, item.cpp, guide.cpp, quiz_challenge.cpp and shop_menu.cpp. Codes in main.cpp involves other files of this game. (File input/output and program codes in multiple files)
+- Players can choose the level of difficulty of the game. (Multiple difficulty levels)
+- Different from traditional minesweeper game, this games has shop and item to help players complete the game.
+- The game also has a quiz about this lesson. Players can study while playing the game. 
 
 ### non-standard libraries:
 - shop_menu.h
