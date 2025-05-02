@@ -68,16 +68,18 @@ bool loadGameState() {
         return false;
     }
 
-    else if (rows == 0 || cols == 0 || mines == 0) {
-        hasActiveGame = false;
-        return false;
-    }
-
     else if (!(file >> rows >> cols >> mines)) {
         std::cout << "\033[1;31mError: Invalid saved game data.\033[0m\n";
         hasActiveGame = false; // No valid game state
         return false;
     }
+
+    else if (rows == 0 || cols == 0 || mines == 0) {
+        hasActiveGame = false;
+        return false;
+    }
+
+
 
     file >> totalScore;
     file >> TemporaryInvincibility >> AutoSweep >> ShieldCount;
@@ -287,12 +289,12 @@ public:
         clearScreen();
         //invincibility notice
         if (gameItem.isInvincible()) {
-            cout << "\033[1;33mInvincibility: " << gameItem.getRemainingInvincibilityReveals() 
+            cout << "\033[1;32mInvincibility: " << gameItem.getRemainingInvincibilityReveals() 
                  << " moves remaining.\033[0m\n";
         }
         //shield notice
         if (gameItem.isShieldActive()) {
-            cout << "\033[1;34m[Shield: " << gameItem.getShieldRemainingTime() 
+            cout << "\033[1;32m[Shield: " << gameItem.getShieldRemainingTime() 
                  << " seconds remaining]\033[0m\n";
         }
         // Print column numbers
@@ -503,6 +505,7 @@ public:
                     time_t sessionEndTime = time(nullptr);
                     totalPlayTime += difftime(sessionEndTime, sessionStartTime); // game time
                     
+                    hasActiveGame = false; // Reset active game status
                     printBoard(true);
                     cout << "\033[1;31mGame Over! You hit a mine.\033[0m\n";
                     cout << "\033[1;31mTime spent: " << totalPlayTime << " seconds.\033[0m\n";
@@ -691,6 +694,10 @@ int main() {
     
     Minesweeper game;
     game.showMenu();
+
+    if (hasActiveGame) {
+        saveGameState(); // Save game state before exiting
+    }
     
     return 0;
 }
