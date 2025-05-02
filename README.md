@@ -10,7 +10,7 @@
 
 ### application description:
 - This is a game named "MineHack". Players need to avoid all mines which are randomly generated and find all safe places in a square map.
-- Points system in this game: There are 4 different levels of difficulty for players to choose. Completing games of different difficulties can earn different scores. Obiviously, completing more difficult games can earn more scores. Scores are used to buy items in the shop. There are several items in the shop which can help players complete the game more quickly and easily. When players complete a game quickly, he can earn extra points for his outstanding performance. Additionally, players can get points by answering quiz which is about this lesson.
+- Points system in this game: There are 4 different levels of difficulty for players to choose. Completing games of different difficulties can earn different scores. Obviously, completing more difficult games can earn more scores. Scores are used to buy items in the shop. There are several items in the shop which can help players complete the game more quickly and easily. When players complete a game quickly, he can earn extra points for his outstanding performance. Additionally, players can get points by answering quiz which is about this lesson.
 - items include：
   - Invincibility: Being invincible in the folllowing three steps
   - Autosweep: Show each cells of a 3*3 square
