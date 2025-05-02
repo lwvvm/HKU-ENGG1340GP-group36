@@ -126,7 +126,7 @@ void itemSystemIntroduction() {
     cout << "\033[1;33mHere's the information of special Items and their cost: \033[0m\n";
     cout << "1. **Temporary Invincibility**: Allows you to reveal three cells without triggering the mines. (5pt)\n";
     cout << "2. **Auto Sweep**: Reveals all cells in a 3x3 area around your selected cell. (10pt)\n";
-    cout << "3. **Hint**: Gives you the information of three random cells. (2pt) \n";
+    cout << "3. **Shield**: Gives you a shield that can protect you from mines once within 30 seconds. (10pt) \n";
     cout << endl;
     cout << "\033[1;34m(Press Enter to return to the main menu)\033[0m" << endl;
     cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Wait for Enter
