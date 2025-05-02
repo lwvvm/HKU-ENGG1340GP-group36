@@ -60,7 +60,7 @@ void Item::performAutoSweep(
 
 // Invincibility implementations
 void Item::activateInvincibility(int reveals) {
-    remainingReveals = reveals;
+    remainingReveals += reveals;
     invincibilityActive = true;
 }
 
