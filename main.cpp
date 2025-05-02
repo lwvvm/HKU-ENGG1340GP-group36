@@ -31,6 +31,8 @@ vector<vector<bool> > revealed;
 vector<vector<bool> > flagged;
 
 bool hasActiveGame = false;
+bool gameOver = false;
+bool gameWon = false;
 
 void saveGameState() {
     std::ofstream file("saved_game_state.txt");
@@ -79,8 +81,6 @@ bool loadGameState() {
         return false;
     }
 
-
-
     file >> totalScore;
     file >> TemporaryInvincibility >> AutoSweep >> ShieldCount;
     file >> totalPlayTime;
@@ -125,7 +125,23 @@ bool loadGameState() {
         }
     }
     file.close();
-    hasActiveGame = true;
+    gameOver = false;
+    gameWon = true;
+    for (int r = 0; r < rows; ++r) {
+        for (int c = 0; c < cols; ++c) {
+            if (revealed[r][c] && mineGrid[r][c]) {
+                gameOver = true; // if a mine is revealed, game is over
+                gameWon = false;
+                break;
+            }
+            if (!revealed[r][c] && !mineGrid[r][c]) {
+                gameWon = false; // if a cell is not revealed and not a mine, game is not won
+            }
+        }
+        if (gameOver) break;
+    }
+
+    hasActiveGame = !(gameOver || gameWon); // if game is over or won, no active game
     return true;
 }
 
@@ -242,6 +258,10 @@ public:
     Minesweeper() : gameOver(false), gameWon(false) {
         srand(time(0));
         if (!loadGameState()) { 
+            if (gameOver) {
+                hasActiveGame = false; 
+            }
+        } else {
             initializeGrid();
         }
     }
@@ -505,11 +525,12 @@ public:
                     time_t sessionEndTime = time(nullptr);
                     totalPlayTime += difftime(sessionEndTime, sessionStartTime); // game time
                     
-                    hasActiveGame = false; // Reset active game status
                     printBoard(true);
                     cout << "\033[1;31mGame Over! You hit a mine.\033[0m\n";
                     cout << "\033[1;31mTime spent: " << totalPlayTime << " seconds.\033[0m\n";
                     
+                    hasActiveGame = false; 
+                    saveGameState();
                     return 1;// Game over, return to difficulty selection
                 }
             }
@@ -548,9 +569,9 @@ public:
                 totalScore += score;
                 cout << "\033[1;31mYou earned " << score << " points!\033[0m\n";
 
-                gameWon = true; 
-                
                 printBoard(true);
+                hasActiveGame = false; // Set to false when game is won
+                saveGameState();
                 return 1; // Game won, return to difficulty selection
             }
         }
@@ -612,7 +633,7 @@ void showMenu() {
                     }
                 }
                 else {
-                    cout << "\033[1;31mNo saved game found. Please start a new game.\033[0m\n";
+                    cout << "\033[1;31mYou cannot continue this game. Please start a new game.\033[0m\n";
                 }
             }
         
