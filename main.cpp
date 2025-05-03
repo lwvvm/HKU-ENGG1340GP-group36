@@ -312,7 +312,7 @@ public:
     void printBoard(bool showMines = false) const {
         clearScreen();
         if (gameItem.isInvincible()) {
-            cout << "\033[1;32mInvincibility: " << gameItem.getRemainingInvincibilityReveals() 
+            cout << "\033[1;32mInvincibility: " << gameItem.getRemainingInvincibilityReveals() - 1
                  << " moves remaining.\033[0m\n";
         }
         if (gameItem.isShieldActive()) {
@@ -442,7 +442,7 @@ public:
                             if (TemporaryInvincibility > 0) {
                                 TemporaryInvincibility--;
                                 saveGameState();
-                                gameItem.activateInvincibility(3);
+                                gameItem.activateInvincibility(4);
                                 setGameMessage("\033[1;32mTemporary Invincibility activated for 3 moves!\033[0m");
                             } else {
                                 setGameMessage("\033[1;31mYou don't have any Invincibility left!\033[0m");
