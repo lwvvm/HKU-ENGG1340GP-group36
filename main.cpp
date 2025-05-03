@@ -563,6 +563,7 @@ public:
                 setGameMessage("\033[1;32mCongratulations! You won!\nYou earned " + to_string(score) + " points!\033[0m\n" + bonusMessage);
 
                 printBoard(true);
+                clearGameMessage();
                 hasActiveGame = false;
                 saveGameState();
                 
@@ -620,6 +621,7 @@ public:
             }
              
             else if (choice == 2) {
+                clearGameMessage();
                 if (hasActiveGame && loadGameState()){
                     if (gameOver){
                         cout << "\033[1;31mYou cannot continue this game. You already lost! Please start a new game.\033[0m\n";
@@ -636,6 +638,7 @@ public:
             }
         
             else if (choice == 1){
+                clearGameMessage();
                 while (true) {    
                     cout << "\nSelect difficulty level:\n";
                     cout << "1. Easy (9x9, 10 mines) - 3 points\n";
