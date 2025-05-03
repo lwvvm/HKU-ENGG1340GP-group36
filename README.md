@@ -1,5 +1,5 @@
 # MineHack
-## ENGG1340 Gourp Porjrct ---- Group36
+## ENGG1340 Gourp Project ---- Group36
 ### Team members:
 - Liang Weibo
 - Lin Yat Fei Angel
