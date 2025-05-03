@@ -542,6 +542,7 @@ public:
             if (checkWin()) {
                 time_t sessionEndTime = time(nullptr);
                 totalPlayTime += difftime(sessionEndTime, sessionStartTime);
+                setGameMessage("\033[1;32mTime spent: " + to_string(totalPlayTime) + " seconds.\033[0m");
                 
                 string bonusMessage = "";
                 if (rows == 9 && cols == 9 && mines == 10 && totalPlayTime < 300) {
@@ -559,7 +560,7 @@ public:
                 }
     
                 totalScore += score;
-                cout << "\033[1;32mCongratulations! You won!\nYou earned " + to_string(score) + " points!\033[0m\n" + bonusMessage;
+                setGameMessage("\033[1;32mCongratulations! You won!\nYou earned " + to_string(score) + " points!\033[0m\n" + bonusMessage);
 
                 printBoard(true);
                 hasActiveGame = false;
