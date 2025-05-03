@@ -46,40 +46,40 @@ void saveGameState() {
                 file << mineGrid[r][c] << " ";
             }
             file << "\n";
-        }
+        }// save the mine grid
         for (int r = 0; r < rows; ++r) {
             for (int c = 0; c < cols; ++c) {
                 file << revealed[r][c] << " ";
             }
             file << "\n";
-        }
+        }// save the revealed grid
         for (int r = 0; r < rows; ++r) {
             for (int c = 0; c < cols; ++c) {
                 file << flagged[r][c] << " ";
             }
             file << "\n";
-        }
+        }// save the flagged grid
         file.close();
     } 
-}
+}// save game state to check the statement of the game
 
 bool loadGameState() {
     std::ifstream file("saved_game_state.txt");
     if (!file) {
-        hasActiveGame = false;
+        hasActiveGame = false; // No valid game state
         return false;
-    }
+    }// check if the file is opened
 
     else if (!(file >> rows >> cols >> mines)) {
         std::cout << "\033[1;31mError: Invalid saved game data.\033[0m\n";
         hasActiveGame = false;
         return false;
-    }
+    }// check if the file has valid data
 
     else if (rows == 0 || cols == 0 || mines == 0) {
         hasActiveGame = false;
         return false;
-    }
+    }// check if the file has valid data
 
     file >> totalScore;
     file >> TemporaryInvincibility >> AutoSweep >> ShieldCount;
@@ -99,7 +99,7 @@ bool loadGameState() {
                 return false;
             }
         }
-    }
+    }// load the mine grid
     for (int r = 0; r < rows; ++r) {
         for (int c = 0; c < cols; ++c) {
             int val;
@@ -111,7 +111,7 @@ bool loadGameState() {
                 return false;
             }
         }
-    }
+    }// load the revealed grid
     for (int r = 0; r < rows; ++r) {
         for (int c = 0; c < cols; ++c) {
             int val;
@@ -123,7 +123,7 @@ bool loadGameState() {
                 return false;
             }
         }
-    }
+    }// load the flagged grid
     file.close();
     gameOver = false;
     gameWon = true;
@@ -139,11 +139,11 @@ bool loadGameState() {
             }
         }
         if (gameOver) break;
-    }
+    }// check if the game is over or won
 
     hasActiveGame = !(gameOver || gameWon);
     return true;
-}
+}// load game state to check the statement of the game
 
 class Minesweeper {
 private:
@@ -170,11 +170,11 @@ private:
                 minesPlaced++;
             }
         }
-    }
+    }// initialize the mine grid
 
     bool isValid(int r, int c) const {
         return r >= 0 && r < rows && c >= 0 && c < cols;
-    }
+    }// check if the cell is valid
 
     int countAdjacentMines(int r, int c) const {
         int count = 0;
@@ -189,7 +189,7 @@ private:
             }
         }
         return count;
-    }
+    }// count the number of adjacent mines
 
     void revealCell(int r, int c) {
         if (!isValid(r, c) || revealed[r][c] || flagged[r][c]) {
@@ -207,7 +207,7 @@ private:
                     setGameMessage("\033[1;33mInvincibility protected you!\033[0m");
                 }
                 return;
-            } 
+            } // protect the player from the mine
             else {
                 gameOver = true;
             }
@@ -232,7 +232,7 @@ private:
             }
         }
         return true;
-    }
+    }// check if the game is won
 
     void printHorizontalLine() const {
         cout << "   +";
@@ -240,7 +240,7 @@ private:
             cout << "---+";
         }
         cout << "\n";
-    }
+    }// print the horizontal line
     
     void clearScreen() const {
         #ifdef _WIN32
@@ -248,7 +248,7 @@ private:
         #else
                 system("clear");
         #endif
-    }
+    }// clear the screen
 
 public:
     Minesweeper() : gameOver(false), gameWon(false) {
@@ -278,25 +278,25 @@ public:
         totalPlayTime = 0;
         gameItem.deactivateInvincibility();
         switch (level) {
-            case 1:
+            case 1:// Easy
                 rows = 9;
                 cols = 9;
                 mines = 10;
                 score = 3;
                 break;
-            case 2:
+            case 2:// Medium
                 rows = 9;
                 cols = 9;
                 mines = 20;
                 score = 5;
                 break;
-            case 3:
+            case 3:// Hard
                 rows = 12;
                 cols = 12;
                 mines = 45;
                 score = 8;
                 break;
-            case 4:
+            case 4:// Expert
                 rows = 12;
                 cols = 12;
                 mines = 60;
@@ -344,15 +344,15 @@ public:
                     if (count > 0) {
                         string color;
                         switch (count) {
-                            case 1: color = "\033[1;34m"; break;
-                            case 2: color = "\033[1;32m"; break;
-                            case 3: color = "\033[1;31m"; break;
-                            case 4: color = "\033[1;35m"; break;
-                            case 5: color = "\033[1;33m"; break;
-                            case 6: color = "\033[1;36m"; break;
-                            case 7: color = "\033[1;37m"; break;
-                            case 8: color = "\033[1;90m"; break;
-                            default: color = "\033[0m"; break;
+                            case 1: color = "\033[1;34m"; break;// Blue
+                            case 2: color = "\033[1;32m"; break;// Green
+                            case 3: color = "\033[1;31m"; break;// Red
+                            case 4: color = "\033[1;35m"; break;// Magenta
+                            case 5: color = "\033[1;33m"; break;// Yellow
+                            case 6: color = "\033[1;36m"; break;// Cyan
+                            case 7: color = "\033[1;37m"; break;// White
+                            case 8: color = "\033[1;90m"; break;// Gray
+                            default: color = "\033[0m"; break;// Default
                         }
                         cout << " " << color << count << "\033[0m |"; 
                     } else {
@@ -379,17 +379,17 @@ public:
     
             string cmd;
             while (true) {
-                cout << "Enter command (r for reveal, f for flag/unflag, i for items, s for shop, q to save and quit): ";
+                cout << "Enter command (r for reveal, f for flag/unflag, i for items, q for save and quit): ";
                 getline(cin, cmd);
                 
                 if (cmd.empty()) {
                     continue;
                 }
     
-                if (cmd.size() == 1 && (cmd[0] == 'r' || cmd[0] == 'f' || cmd[0] == 'q' || cmd[0] == 's' || cmd[0] == 'i')) {
+                if (cmd.size() == 1 && (cmd[0] == 'r' || cmd[0] == 'f' || cmd[0] == 'q' || cmd[0] == 'i')) {
                     break;
                 } else {
-                    setGameMessage("\033[1;31mInvalid command! Please enter ONLY 'r', 'f', 'i', 's' or 'q'.\033[0m");
+                    setGameMessage("\033[1;31mInvalid command! Please enter ONLY 'r', 'f', 'i' or 'q'.\033[0m");
                 }
             }
     
@@ -401,11 +401,6 @@ public:
                 setGameMessage("\033[1;32mGame progress saved successfully. You can continue next time!\033[0m");
                 printBoard();
                 return 0;
-            }
-            
-            if (cmd[0] == 's') {
-                shop_menu(totalScore, TemporaryInvincibility, AutoSweep, ShieldCount);
-                continue;
             }
 
             if (cmd[0] == 'i') {
@@ -515,6 +510,9 @@ public:
                 if (flagged[r][c]) {
                     setGameMessage("\033[1;31mCell is flagged. Unflag it first.\033[0m");
                     continue;
+                }
+                else{
+                    setGameMessage("\033[1;32mCell revealed successfully!\033[0m");
                 }
                 gameItem.countInvincibilityReveal();
                 
