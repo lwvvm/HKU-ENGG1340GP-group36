@@ -389,7 +389,7 @@ public:
                 if (cmd.size() == 1 && (cmd[0] == 'r' || cmd[0] == 'f' || cmd[0] == 'q' || cmd[0] == 'i')) {
                     break;
                 } else {
-                    setGameMessage("\033[1;31mInvalid command! Please enter ONLY 'r', 'f', 'i' or 'q'.\033[0m");
+                    cout << "\033[1;31mInvalid command! Please enter ONLY 'r', 'f', 'i' or 'q'.\033[0m\n";
                 }
             }
     
@@ -416,7 +416,7 @@ public:
                     getline(cin, itemInput);
 
                     if (itemInput.empty()) {
-                        setGameMessage("\033[1;31mInvalid input! Please enter a number between 1 and 4.\033[0m");
+                        cout << "\033[1;31mInvalid input! Please enter a number between 1 and 4.\033[0m\n";
                         continue;
                     }
 
@@ -428,7 +428,7 @@ public:
                         }
                     }
                     if (!is_valid) {
-                        setGameMessage("\033[1;31mInvalid input! Please enter a number between 1 and 4.\033[0m");
+                        cout <<"\033[1;31mInvalid input! Please enter a number between 1 and 4.\033[0m\n";
                         continue;
                     } 
 
@@ -488,18 +488,18 @@ public:
     
                 stringstream ss(coordInput);
                 if (!(ss >> r >> c)) {
-                    setGameMessage("\033[1;31mInvalid input! Please enter TWO numbers separated by space.\033[0m");
+                    cout << "\033[1;31mInvalid input! Please enter TWO numbers separated by space.\033[0m\n";
                     continue;
                 }
     
                 string remaining;
                 if (ss >> remaining) {
-                    setGameMessage("\033[1;31mInvalid input! Only two numbers allowed (e.g. '3 5').\033[0m");
+                    cout << "\033[1;31mInvalid input! Only two numbers allowed (e.g. '3 5').\033[0m\n";
                     continue;
                 }
     
                 if (!isValid(r, c)) {
-                    setGameMessage("\033[1;31mInvalid position! Row and column must be 0-" + std::to_string(rows-1) + ".\033[0m");
+                    cout << "\033[1;31mInvalid position! Row and column must be 0-" + std::to_string(rows-1) + ".\033[0m\n";
                     continue;
                 }
     
@@ -559,7 +559,7 @@ public:
                 }
     
                 totalScore += score;
-                setGameMessage("\033[1;32mCongratulations! You won!\nYou earned " + to_string(score) + " points!\033[0m\n" + bonusMessage);
+                cout << "\033[1;32mCongratulations! You won!\nYou earned " + to_string(score) + " points!\033[0m\n" + bonusMessage;
 
                 printBoard(true);
                 hasActiveGame = false;
