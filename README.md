@@ -2,7 +2,7 @@
 ## ENGG1340 Gourp Porjrct ---- Group36
 ### Team members:
 - Liang Weibo
-- Lin Yet Fei Angel
+- Lin Yat Fei Angel
 - Lin Zhongxi
 - Lo Ka Lai
 - Tso Kok Ching
